@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>IGS VIEWER</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie-edge">
+		<meta name="mobile-web-app-capable" content="yes">
+		<link rel="stylesheet" href="IGS2.css" media="screen"/>
+	</head>
+	<body id="body">
+		<div id='main'>
+			<div id='tab_row'>
+				<div id='UNION_F1' class='tabs tab_selected' onclick='tabClicked(this.id);' style='width: calc(100% / 2);'>F1</div>
+				<div id='UNION_F2' class='tabs tab_notselected' onclick='tabClicked(this.id);' style='width: calc(100% / 2);'>F2</div>
+				<div id='UNION_F3' class='tabs tab_notselected' onclick='tabClicked(this.id);' style='width: calc(100% / 2);'>F3</div>
+				<!-- <div id='UNION_F4' class='tabs tab_notselected' onclick='tabClicked(this.id);' style='width: calc(100% / 2);'>F4</div> -->
+				<!-- <div id='UNION_F5' class='tabs tab_notselected' onclick='tabClicked(this.id);' style='width: calc(100% / 2);'>F5</div> -->
+				<!-- <div id='UNION_F6' class='tabs tab_notselected' onclick='tabClicked(this.id);' style='width: calc(100% / 2);'>F6</div> -->
+			</div>
+			<div id='tab_body'></div>
+		</div>
+	<script
+	src="http://code.jquery.com/jquery-3.4.1.min.js"
+	integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+	crossorigin="anonymous"></script>
+	<script type="text/javascript" src="js/test.js"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<script type="text/javascript" src="IGS2.js"></script>
+	</body>
+</html> 
