@@ -1070,10 +1070,12 @@
 
 .landing-HMI {
 	height: var(--land_height);
+	width:50vw;
   }
 
 .landing-TREND {
 	height: var(--land_height);
+	width:50vw;
   }
   
  .myChart{
