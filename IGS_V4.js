@@ -462,7 +462,7 @@ function updateHMI(ID) {
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_OUTPUT').innerHTML = decAdj(ModbusData[ID].PID_SEL_OP,10,1) + " %";
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUETEMP').innerHTML = decAdj(ModbusData[ID].FLUE_TEMP_PV,10,1) + " °C";
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUESP').innerHTML = decAdj(ModbusData[ID].FLUE_PID_SP,10,0) + " °C";
-	document.getElementById(FurnaceID + '_HMI_CONTROLS_GASFLOW').innerHTML = decAdj(ModbusData[ID].GAS_FLOW_PV,10,1) + " m3/h";
+	document.getElementById(FurnaceID + '_HMI_CONTROLS_GASFLOW').innerHTML = decAdj(ModbusData[ID].GAS_FLOW_PV,10,1) + " Ltr/h";
 	document.getElementById(FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK_TEXT').innerHTML = CustomerData[ID].FurnaceID;
 	setBurnerGroup(FurnaceID,'A1',ModbusData[ID].A1_PVALVE,ModbusData[ID].A1_SGAS,ModbusData[ID].A1_FAULT)
 	setBurnerGroup(FurnaceID,'A2',ModbusData[ID].A2_PVALVE,ModbusData[ID].A2_SGAS,ModbusData[ID].A2_FAULT)
