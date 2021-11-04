@@ -202,23 +202,31 @@
 }
 
 #body {
+	position: relative;
 	font-family: 'Roboto Condensed', sans-serif;
 	margin: 0;
 	background: #eee;
 	height: auto;
 }
 
-.main {
+#main {
+	position: relative;
 	display:block;
 	overflow: hidden;
 }
 
-#tab_row{    
+#tab_row{
+	position: relative;
 	height: 3vh;
 	display: flex;
 }
 
+#tab_body{
+	position: relative;
+}
+
 .landing {
+	position: relative;
 	background: #fff;
 }
 
@@ -257,22 +265,21 @@
 }
 
 .landing-HMI {
+	position: relative;
 	display: flex;
 	flex: 0 1 50vw;
 	/*height: var(--port_height);*/
 	flex-direction: column;
-	position: relative;
 }
 
 .landing-TREND {
+	position: relative;
 	display: flex;
 	flex: 0 1 50vw;
 	height: var(--port_height);
 	justify-content: center;
 	align-items: center;
 	text-align: center;
-	<!-- background-color:#999; -->
-	position: relative;
 }
 
 .fan{
