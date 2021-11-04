@@ -4,8 +4,9 @@ var SampleCount = 3;
 var pulseFlag = false;
 var LoopUp = true;
 var toggle = false;
-var Customer = 'APG';
-var FurnaceID = 'APG';
+var thisCustomer = 'APG';
+var thisFurnaceID = 'APG';
+var thisBurnerCount = 8;
 var visible = true;
 var centerTop = 14;
 var TopMaximised = false;
@@ -40,6 +41,30 @@ function GetArduinoInputs(){
 						ModbusData[0].GAS_FLOW_PV = this.responseXML.getElementsByTagName('gasflow')[0].childNodes[0].nodeValue;
 						ModbusData[0].FAN_1_SPEED = this.responseXML.getElementsByTagName('fanAspeed')[0].childNodes[0].nodeValue;
 						ModbusData[0].FAN_2_SPEED = this.responseXML.getElementsByTagName('fanBspeed')[0].childNodes[0].nodeValue;
+						
+						ModbusData[0].EX_IN = this.responseXML.getElementsByTagName('exin')[0].childNodes[0].nodeValue;
+						ModbusData[0].EX_OUT = this.responseXML.getElementsByTagName('exout')[0].childNodes[0].nodeValue;
+						ModbusData[0].DRY_IN = this.responseXML.getElementsByTagName('dryin')[0].childNodes[0].nodeValue;
+						ModbusData[0].DRY_OUT = this.responseXML.getElementsByTagName('dryout')[0].childNodes[0].nodeValue;
+						ModbusData[0].DRY_SPEED = this.responseXML.getElementsByTagName('drySpeed')[0].childNodes[0].nodeValue;
+						ModbusData[0].DRY_SP = this.responseXML.getElementsByTagName('drySP')[0].childNodes[0].nodeValue;
+						ModbusData[0].DRY_INT = this.responseXML.getElementsByTagName('dryDig')[0].childNodes[0].nodeValue;
+						
+						ModbusData[0].DMD_OUT = this.responseXML.getElementsByTagName('dmdOut')[0].childNodes[0].nodeValue;
+						ModbusData[0].DMD_TIME = this.responseXML.getElementsByTagName('dmdTime')[0].childNodes[0].nodeValue;
+						ModbusData[0].KB_TEMP = this.responseXML.getElementsByTagName('KBTemp')[0].childNodes[0].nodeValue;
+						ModbusData[0].CREEP_TEMP = this.responseXML.getElementsByTagName('creepTemp')[0].childNodes[0].nodeValue;
+						ModbusData[0].KB_VAL = this.responseXML.getElementsByTagName('KBval')[0].childNodes[0].nodeValue;
+						ModbusData[0].KB_HYST = this.responseXML.getElementsByTagName('KBHyst')[0].childNodes[0].nodeValue;
+						ModbusData[0].MAX_DMD = this.responseXML.getElementsByTagName('MaxDmd')[0].childNodes[0].nodeValue;
+						ModbusData[0].FAN_SPEED = this.responseXML.getElementsByTagName('FanSPD')[0].childNodes[0].nodeValue;
+						ModbusData[0].LOW_TEMP = this.responseXML.getElementsByTagName('lowTemp')[0].childNodes[0].nodeValue;
+						ModbusData[0].ZINC_CAL = this.responseXML.getElementsByTagName('Cal')[0].childNodes[0].nodeValue;
+						ModbusData[0].FLUE_CTRL_ACT_TEMP = this.responseXML.getElementsByTagName('FCActTemp')[0].childNodes[0].nodeValue;
+						ModbusData[0].FLUE_CTRL_DACT_TEMP = this.responseXML.getElementsByTagName('FCDActTemp')[0].childNodes[0].nodeValue;
+						ModbusData[0].HT_CUTOUT = this.responseXML.getElementsByTagName('HTCutout')[0].childNodes[0].nodeValue;
+						ModbusData[0].HT_HYST = this.responseXML.getElementsByTagName('HTHyst')[0].childNodes[0].nodeValue;
+						ModbusData[0].PULSE_CYC_TIME = this.responseXML.getElementsByTagName('PCycTime')[0].childNodes[0].nodeValue;
 					}
 				}
 			}
@@ -95,7 +120,7 @@ function GetArduinoLogdata(){
 }
 
 function Main(){
-	CustomerData.push({Customer: 'APG', FurnaceID: 'APG', IncludeDips: false, BurnerCount: 8});
+	CustomerData.push({Customer: thisCustomer, FurnaceID: thisFurnaceID, IncludeDips: false, BurnerCount: thisBurnerCount});
 	for(var i=0;i<CustomerData.length;i++){
 		if(CustomerData[i].BurnerCount == 12){centerTop = 10.75;};
 		createLayout(CustomerData[i].Customer + "_" + CustomerData[i].FurnaceID,'tab_body',CustomerData[i].IncludeDips,CustomerData[i].BurnerCount,visible);
@@ -373,47 +398,47 @@ function decodeBurner(ID,BurnerID){
 	switch(BurnerID){
 		case 1:
 			var thisArray = INTOTBOOL(ModbusData[ID].BURNER_1_INT);
-			ModbusData[ID].A1_FAULT = thisArray[0];
-			ModbusData[ID].A1_SGAS = thisArray[1];
-			ModbusData[ID].A1_PRESS = thisArray[2];
-			ModbusData[ID].A1_PVALVE = thisArray[3];
-			ModbusData[ID].B1_FAULT = thisArray[4];
-			ModbusData[ID].B1_SGAS = thisArray[5];
-			ModbusData[ID].B1_PRESS = thisArray[6];
-			ModbusData[ID].B1_PVALVE = thisArray[7];
+			ModbusData[ID].A1_FAULT = 	thisArray[0];
+			ModbusData[ID].A1_SGAS = 	thisArray[1];
+			ModbusData[ID].A1_PRESS = 	thisArray[2];
+			ModbusData[ID].A1_PVALVE = 	thisArray[3];
+			ModbusData[ID].B1_FAULT = 	thisArray[4];
+			ModbusData[ID].B1_SGAS = 	thisArray[5];
+			ModbusData[ID].B1_PRESS = 	thisArray[6];
+			ModbusData[ID].B1_PVALVE = 	thisArray[7];
 			break;
 		case 2:
 			var thisArray = INTOTBOOL(ModbusData[ID].BURNER_2_INT);
-			ModbusData[ID].A2_FAULT = thisArray[0];
-			ModbusData[ID].A2_SGAS = thisArray[1];
-			ModbusData[ID].A2_PRESS = thisArray[2];
-			ModbusData[ID].A2_PVALVE = thisArray[3];
-			ModbusData[ID].B2_FAULT = thisArray[4];
-			ModbusData[ID].B2_SGAS = thisArray[5];
-			ModbusData[ID].B2_PRESS = thisArray[6];
-			ModbusData[ID].B2_PVALVE = thisArray[7];
+			ModbusData[ID].A2_FAULT = 	thisArray[0];
+			ModbusData[ID].A2_SGAS = 	thisArray[1];
+			ModbusData[ID].A2_PRESS = 	thisArray[2];
+			ModbusData[ID].A2_PVALVE = 	thisArray[3];
+			ModbusData[ID].B2_FAULT = 	thisArray[4];
+			ModbusData[ID].B2_SGAS = 	thisArray[5];
+			ModbusData[ID].B2_PRESS = 	thisArray[6];
+			ModbusData[ID].B2_PVALVE = 	thisArray[7];
 			break;
 		case 3:
 			var thisArray = INTOTBOOL(ModbusData[ID].BURNER_3_INT);
-			ModbusData[ID].A3_FAULT = thisArray[0];
-			ModbusData[ID].A3_SGAS = thisArray[1];
-			ModbusData[ID].A3_PRESS = thisArray[2];
-			ModbusData[ID].A3_PVALVE = thisArray[3];
-			ModbusData[ID].B3_FAULT = thisArray[4];
-			ModbusData[ID].B3_SGAS = thisArray[5];
-			ModbusData[ID].B3_PRESS = thisArray[6];
-			ModbusData[ID].B3_PVALVE = thisArray[7];
+			ModbusData[ID].A3_FAULT = 	thisArray[0];
+			ModbusData[ID].A3_SGAS = 	thisArray[1];
+			ModbusData[ID].A3_PRESS = 	thisArray[2];
+			ModbusData[ID].A3_PVALVE = 	thisArray[3];
+			ModbusData[ID].B3_FAULT = 	thisArray[4];
+			ModbusData[ID].B3_SGAS = 	thisArray[5];
+			ModbusData[ID].B3_PRESS = 	thisArray[6];
+			ModbusData[ID].B3_PVALVE = 	thisArray[7];
 			break;
 		case 4:
 			var thisArray = INTOTBOOL(ModbusData[ID].BURNER_4_INT);
-			ModbusData[ID].A4_FAULT = thisArray[0];
-			ModbusData[ID].A4_SGAS = thisArray[1];
-			ModbusData[ID].A4_PRESS = thisArray[2];
-			ModbusData[ID].A4_PVALVE = thisArray[3];
-			ModbusData[ID].B4_FAULT = thisArray[4];
-			ModbusData[ID].B4_SGAS = thisArray[5];
-			ModbusData[ID].B4_PRESS = thisArray[6];
-			ModbusData[ID].B4_PVALVE = thisArray[7];
+			ModbusData[ID].A4_FAULT = 	thisArray[0];
+			ModbusData[ID].A4_SGAS = 	thisArray[1];
+			ModbusData[ID].A4_PRESS = 	thisArray[2];
+			ModbusData[ID].A4_PVALVE = 	thisArray[3];
+			ModbusData[ID].B4_FAULT = 	thisArray[4];
+			ModbusData[ID].B4_SGAS = 	thisArray[5];
+			ModbusData[ID].B4_PRESS = 	thisArray[6];
+			ModbusData[ID].B4_PVALVE = 	thisArray[7];
 			break;
 	}
 	
@@ -423,28 +448,42 @@ function decodeZone(ID,ZoneID){
 	switch(ZoneID){
 		case 1:
 			var thisArray = INTOTBOOL(ModbusData[ID].ZONE_A_INT);
-			ModbusData[ID].ZAPurge = thisArray[0];
-			ModbusData[ID].ZAPComp = thisArray[1];
-			ModbusData[ID].AM_PRESS = thisArray[2];
-			ModbusData[ID].ZAFanON = thisArray[3];
+			ModbusData[ID].ZAPurge = 	thisArray[0];
+			ModbusData[ID].ZAPComp = 	thisArray[1];
+			ModbusData[ID].AM_PRESS = 	thisArray[2];
+			ModbusData[ID].ZAFanON = 	thisArray[3];
 			ModbusData[ID].ZAFanFault = thisArray[4];
 			break;
 		case 2:
 			var thisArray = INTOTBOOL(ModbusData[ID].ZONE_B_INT);
-			ModbusData[ID].ZBPurge = thisArray[0];
-			ModbusData[ID].ZBPComp = thisArray[1];
-			ModbusData[ID].BM_PRESS = thisArray[2];
-			ModbusData[ID].ZBFanON = thisArray[3];
+			ModbusData[ID].ZBPurge = 	thisArray[0];
+			ModbusData[ID].ZBPComp = 	thisArray[1];
+			ModbusData[ID].BM_PRESS = 	thisArray[2];
+			ModbusData[ID].ZBFanON = 	thisArray[3];
 			ModbusData[ID].ZBFanFault = thisArray[4];
 			break;
 	}
-	
 }
 
 function decodeSystem(ID){
 	var thisArray = INTOTBOOL(ModbusData[ID].SYS_INT);
-	ModbusData[ID].SYS_ON = thisArray[0];
-	ModbusData[ID].SYS_FAULT = thisArray[1];
+	ModbusData[ID].SYS_ON = 		thisArray[0];
+	ModbusData[ID].FanSpeedCtrl = 	thisArray[1];
+	ModbusData[ID].Rotation = 		thisArray[2];
+	ModbusData[ID].SeqCtrl = 		thisArray[3];
+	ModbusData[ID].SYS_FAULT = 		thisArray[7];
+}
+
+function decodeDryer(ID){
+	var thisArray = INTOTBOOL(ModbusData[ID].DRY_INT);
+	ModbusData[ID].DRY_FAN_CB = 	thisArray[0];
+	ModbusData[ID].DRY_FAN_FAULT = 	thisArray[1];
+	ModbusData[ID].DRY_FAN_STATE = 	thisArray[2];
+	ModbusData[ID].DRY_FAN_AM = 	thisArray[3];
+	ModbusData[ID].LD_OPEN = 		thisArray[4];
+	ModbusData[ID].LD_CLOSED = 		thisArray[5];
+	ModbusData[ID].UD_OPEN = 		thisArray[6];
+	ModbusData[ID].UD_CLOSED = 		thisArray[7];
 }
 
 function updateHMI(ID) {
@@ -456,6 +495,7 @@ function updateHMI(ID) {
 	decodeZone(ID,1);
 	decodeZone(ID,2);
 	decodeSystem(ID);
+	decodeDryer(ID);
 	var FurnaceID = CustomerData[ID].Customer + "_" + CustomerData[ID].FurnaceID;
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCTEMP').innerHTML = decAdj(ModbusData[ID].ZINC_TEMP_PV,10,1) + " °C";
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCSP').innerHTML = decAdj(ModbusData[ID].ZINC_PID_SP,10,0) + " °C";
@@ -523,7 +563,40 @@ function defineModbusData(ID){
 		ZONE_A_INT:0,
 		ZONE_B_INT:0,
 		SYS_INT:0,
+		DRY_INT:0,
+		EX_IN:0,
+		EX_OUT:0,
+		DRY_IN:0,
+		DRY_OUT:0,
+		DRY_SPEED:0,
+		DRY_SP:0,
+		DMD_OUT:0,
+		DMD_TIME:0,
+		KB_TEMP:0,
+		CREEP_TEMP:0,
+		KB_VAL:0,
+		KB_HYST:0,
+		MAX_DMD:0,
+		FAN_SPEED:0,
+		LOW_TEMP:0,
+		ZINC_CAL:0,
+		FLUE_CTRL_ACT_TEMP:0,
+		FLUE_CTRL_DACT_TEMP:0,
+		HT_CUTOUT:0,
+		HT_HYST:0,
+		PULSE_CYC_TIME:0,
+		DRY_FAN_CB:false,
+		DRY_FAN_FAULT:false,
+		DRY_FAN_STATE:false,
+		DRY_FAN_AM:false,
+		LD_OPEN:false,
+		LD_CLOSED:false,
+		UD_OPEN:false,
+		UD_CLOSED:false,
 		SYS_ON:false,
+		FanSpeedCtrl:false,
+		Rotation:false,
+		SeqCtrl:false,
 		SYS_FAULT:false,
 		ZAPurge:false,
 		ZAPComp:false,
