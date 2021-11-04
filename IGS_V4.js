@@ -4,16 +4,16 @@ var SampleCount = 3;
 var pulseFlag = false;
 var LoopUp = true;
 var toggle = false;
-var thisCustomer = 'APG';
-var thisFurnaceID = 'APG';
+var thisCustomer = 'IGS';
+var thisFurnaceID = 'IGS';
 var thisBurnerCount = 8;
+var thisDryer = true;
+var thisEnclosure = true;
 var visible = true;
 var centerTop = 14;
 var TopMaximised = false;
 var USESIM = false;
 var myChart
-
-Main();
 
 function GetArduinoInputs(){
 	try{
