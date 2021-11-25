@@ -31,6 +31,7 @@
 	--main-taskbar-font-family: Arial;
 	--fan-1-speed:1s;
 	--fan-2-speed:1s;
+	--fan-dryer-speed:1s;
 	--valve_width:20%;
 	--port_height:50vh;
 	--land_height:100vh;
@@ -272,6 +273,22 @@
 	flex-direction: column;
 }
 
+.landing-DRY {
+	position: relative;
+	display: flex;
+	flex: 0 1 50vw;
+	/*height: var(--port_height);*/
+	flex-direction: column;
+}
+
+.landing-PARAM {
+	position: relative;
+	display: flex;
+	flex: 0 1 50vw;
+	/*height: var(--port_height);*/
+	flex-direction: column;
+}
+
 .landing-TREND {
 	position: relative;
 	display: flex;
@@ -280,6 +297,131 @@
 	justify-content: center;
 	align-items: center;
 	text-align: center;
+}
+
+.landing-TREND_FOREGROUND {
+	position: absolute;
+    display: flex;
+    flex: 0 1 50vw;
+    height: var(--port_height);
+    z-index: 100;
+    width: 100%;
+    top: 0;
+}
+
+.DRYER_SECTION_LEFT{
+    display: flex;
+    position: relative;
+    width: 50%;
+    height: 100%;
+	box-sizing: border-box;
+	padding: 2%;
+	flex-direction: column;
+}
+
+.DRYER_SECTION_RIGHT{
+	display: flex;
+    position: relative;
+    width: 50%;
+    height: 100%;
+	box-sizing: border-box;
+	padding: 2%;
+	flex-direction: column;
+}
+
+.DRYER_DOOR{
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 25%;
+    background-color: grey;
+	color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    margin: 1%;
+}
+
+.DRYER_SECTION_RIGHT_TOP{
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 20%;
+    justify-content: center;
+    align-items: center;
+}
+
+.DRYER_SECTION_RIGHT_MID{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 40%;
+	flex-direction: column;
+}
+
+.DRYER_SECTION_RIGHT_BOT{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 20%;
+	justify-content: center;
+    align-items: center;
+}
+
+.DRYER_CB{
+    padding: 0.25rem;
+    display: flex;
+    position: relative;
+    background-color: white;
+    color: red;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    border: 0.1rem solid #555;
+    height: fit-content;
+	width: 90%;
+}
+
+.DRYER_STATUS{
+	padding: 0.25rem;
+    display: flex;
+    position: relative;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    border: 0.1rem solid #555;
+    height: fit-content;
+	width: 90%;
+}
+
+.DRYER_MODE{
+	padding: 0.25rem;
+    display: flex;
+    position: relative;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    border: 0.1rem solid #555;
+    height: fit-content;
+	width: 90%;
+}
+
+.HMI_DRYER{
+	position: relative;
+	display: flex;
+	flex: 0 1 50vw;
+	height: var(--port_height);
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+.HMI_PARAM{
+	
 }
 
 .fan{
@@ -297,6 +439,10 @@
 
 .fan2{
 	animation: infiniteRotate var(--fan-2-speed) linear infinite;
+}
+
+.Dryerfan{
+	animation: infiniteRotate var(--fan-dryer-speed) linear infinite;
 }
 
 .fan svg path{
@@ -369,6 +515,24 @@
 
 .PURGE_TEXT{
 	font-size: calc(0.9vh + 0.9vw);
+}
+
+.DRYER_FAN_BOX_TOP{
+	display: flex;
+	position: relative;
+	height: 75%;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.DRYER_FAN_BOX_BOT{
+	display: flex;
+	position: relative;
+	height: 25%;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
 }
 
 .FAN_BOX{
@@ -512,6 +676,17 @@
 	flex-direction: column;
 }
 
+.DRY_CONTROLS {
+	display: flex;
+	height: 10vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	background-color: blue;
+	position: relative;
+	flex-direction: column;
+}
+
 .HMI_CONTROLS_MAX {
 	display: flex;
 	height: 100vh;
@@ -524,6 +699,17 @@
 }
 
 .HMI_GRAPHICS {
+	position: relative;
+	display: inline-flex;
+	height: 40vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	background-color: darkgray;
+	width: 100%;
+}
+
+.DRY_GRAPHICS {
 	position: relative;
 	display: inline-flex;
 	height: 40vh;
@@ -562,6 +748,25 @@
 
 .HMI_CONT_GASFLOW{
 	background-color: orange;
+}
+
+.DRY_CONT_DATA{
+	background-color: #9999ff;
+}
+
+.DRY_EX_TEMP{
+	background-color: hsl(180, 100%, 50%); 
+	color: black;
+}
+
+.DRY_DRYER_TEMP{
+	background-color: hsl(60, 100%, 40%);
+	color: black;
+}
+
+.DRY_FAN_SPEED{
+	background-color: hsl(0, 0%, 100%);
+	color: black;
 }
 
 .HMI_SIDE{
@@ -603,6 +808,19 @@
 	height: calc(calc(calc(calc(var(--BHP)*.9)/8)*7) + calc(var(--BHP)*.05));
 	box-sizing: border-box;
 	width: 100%;
+}
+
+.HMI_TOP_FOREGROUND{
+	display: flex;
+	position: absolute;
+	border: 3px solid transparent;
+	background-color: transparent;
+	justify-content: center;
+	align-items: center;
+	height: calc(calc(calc(calc(var(--BHP)*.9)/8)*7) + calc(var(--BHP)*.05));
+	box-sizing: border-box;
+	width: 100%;
+	z-index: 500 !important;
 }
 
 .HMI_TOP_BACK_MIDDLE{
@@ -983,6 +1201,111 @@
 	height: calc(100vh / 3);
 }
 
+.DRY_ROW_TOP{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(calc(100% / 3)*2) - 2px);
+	position: relative;
+}
+
+.DRY_ROW_BOT{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(100% / 3) - 2px);
+	position: relative;
+}
+
+.DRY_ROW_TOP_MAX{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(calc(100% / 3)*2) - 7px);
+	position: relative;
+	flex-direction: column;
+}
+
+.DRY_ROW_BOT_MAX{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(100vh /3);
+	position: relative;
+	flex-direction: column;
+}
+
+.DRY_BLOCK{
+	display: inline-flex;
+	width: 50%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(1.2vw + 1.2vh);
+}
+
+.DRY_DATA{
+	display: inline-flex;
+	width: 50%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: calc(1.2vw + 1.2vh);
+	padding-right: 2%;
+}
+
+.DRY_BLOCK_MAX{
+	display: inline-flex;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(4vw + 4vh);
+}
+
+.DRY_DATA_MAX{
+	display: inline-flex;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: calc(4vw + 4vh);
+	padding-right: 2%;
+}
+
+.DRY_WRAPPER{
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.DRY_WRAPPER_MAX{
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.DRY_SECTION_WRAPPER{
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+}
+
+.DRY_SECTION_WRAPPER_MAX{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: calc(100vh / 3);
+}
+
 .VALVE{
 	display: flex;
 	width: calc(calc(var(--burner-group-height)*0.5)*0.8);
@@ -1079,11 +1402,46 @@
 	height: var(--land_height);
 	width:50vw;
   }
+  
+.landing-DRY {
+	height: var(--land_height);
+	width:50vw;
+  }
+  
+.landing-PARAM {
+	height: var(--land_height);
+	width:50vw;
+  }
 
 .landing-TREND {
 	height: var(--land_height);
 	width:50vw;
-  }
+}
+  
+.landing-TREND_FOREGROUND {
+	height: var(--land_height);
+	width:50vw;
+}
+  
+.DRYER_DOOR{
+	font-size:2vw;
+}
+  
+.DRYER_CB{
+	font-size:2vw;
+}
+
+.DRYER_STATUS{
+	font-size:2vw;
+}
+
+.DRYER_MODE{
+	font-size:2vw;
+}
+
+.DRYER_FAN_BOX_BOT{
+	font-size:2vw;
+}
   
  .myChart{
 	 width:50vw;
@@ -1115,7 +1473,21 @@
 	height: calc(calc(calc(calc(var(--BHL)*.9)/8)*7) + calc(var(--BHL)*.05));
 }
 
+.HMI_TOP_FOREGROUND{
+	height: calc(calc(calc(calc(var(--BHL)*.9)/8)*7) + calc(var(--BHL)*.05));
+}
+
+
+
+.DRY_TOP_BACK{
+	height: calc(calc(calc(calc(var(--BHL)*.9)/8)*7) + calc(var(--BHL)*.05));
+}
+
 .HMI_CONTROLS {
+	height: 20vh;
+}
+
+.DRY_CONTROLS {
 	height: 20vh;
 }
 
@@ -1124,7 +1496,16 @@
 	height: 100vh;
 }
 
+.DRY_CONTROLS_MAX {
+	width: 100vw;
+	height: 100vh;
+}
+
 .HMI_GRAPHICS {
+	height: 80vh;
+}
+
+.DRY_GRAPHICS {
 	height: 80vh;
 }
 
@@ -1133,6 +1514,14 @@
 }
 
 .HMI_DATA_MAX{
+	font-size: calc(3vw + 3vh);
+}
+
+.DRY_BLOCK_MAX{
+	font-size: calc(3vw + 3vh);
+}
+
+.DRY_DATA_MAX{
 	font-size: calc(3vw + 3vh);
 }
 
@@ -1297,4 +1686,3 @@
 }
 
 }
-
