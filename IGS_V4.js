@@ -8,12 +8,16 @@ var thisCustomer = 'IGS';
 var thisFurnaceID = 'IGS';
 var thisBurnerCount = 8;
 var thisDryer = true;
-var thisEnclosure = true;
+var thisEnclosure = false;
+var thisDipCount = false;
+var thisRefreshRate = 2000;
 var visible = true;
 var centerTop = 14;
 var TopMaximised = false;
+var HMITrendMaximised = false;
 var USESIM = false;
-var myChart
+var myChart;
+var LogSuccess = false;
 
 function GetArduinoInputs(){
 	try{
@@ -72,15 +76,13 @@ function GetArduinoInputs(){
 		request.open("GET", "ajax_inputs" + nocache, true);
 		request.send(null);
 		updateHMI(0);
-		setTimeout('GetArduinoInputs()', 2000);
+		setTimeout('GetArduinoInputs()', thisRefreshRate);
 	} catch(err){
 		//console.log('XML Request Failed');
-		setTimeout('GetArduinoInputs()', 2000);
+		setTimeout('GetArduinoInputs()', thisRefreshRate);
 		//chartUpdate(0); //temporary to test chart
 	}
 }
-
-var LogSuccess = false;
 
 function GetArduinoLogdata(){
 	try{
@@ -253,7 +255,6 @@ function defineChart(){
 		}
 	});
 }
-
 
 function chartUpdate(ID){	
 	var prevx = new Date(); 
@@ -496,6 +497,17 @@ function updateHMI(ID) {
 	decodeZone(ID,2);
 	decodeSystem(ID);
 	decodeDryer(ID);
+	
+	//testing//
+	//ModbusData[ID].LD_OPEN = true;
+	//ModbusData[ID].UD_CLOSED = true;
+	//ModbusData[ID].DRY_FAN_CB = true;
+	//ModbusData[ID].DRY_FAN_FAULT = true;
+	//ModbusData[ID].DRY_FAN_STATE = true;
+	//ModbusData[ID].DRY_SPEED = 100;
+	//ModbusData[ID].DRY_FAN_AM = true;
+	//testimg//
+	
 	var FurnaceID = CustomerData[ID].Customer + "_" + CustomerData[ID].FurnaceID;
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCTEMP').innerHTML = decAdj(ModbusData[ID].ZINC_TEMP_PV,10,1) + " °C";
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCSP').innerHTML = decAdj(ModbusData[ID].ZINC_PID_SP,10,0) + " °C";
@@ -503,6 +515,58 @@ function updateHMI(ID) {
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUETEMP').innerHTML = decAdj(ModbusData[ID].FLUE_TEMP_PV,10,1) + " °C";
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUESP').innerHTML = decAdj(ModbusData[ID].FLUE_PID_SP,10,0) + " °C";
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_GASFLOW').innerHTML = decAdj(ModbusData[ID].GAS_FLOW_PV,10,1) + " Ltr/h";
+	if(thisDryer){
+		var calcSpeed = 0;
+		if((110 - ModbusData[ID].DRY_SPEED) < 110){
+			calcSpeed = (110 - ModbusData[ID].DRY_SPEED)/10
+		};
+		document.documentElement.style.setProperty('--fan-dryer-speed', calcSpeed.toFixed(1) + 's');
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP').innerHTML = decAdj(ModbusData[ID].EX_IN,10,1) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGSP').innerHTML = decAdj(ModbusData[ID].EX_OUT,10,1) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERINTEMP').innerHTML = decAdj(ModbusData[ID].DRY_IN,10,1) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERSP').innerHTML = decAdj(ModbusData[ID].DRY_OUT,10,1) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSPEED').innerHTML = decAdj(ModbusData[ID].DRY_SPEED,10,0) + " %";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSP').innerHTML = decAdj(ModbusData[ID].DRY_SP,10,0) + " °C";
+		setDryerDoor(FurnaceID + '_DRYER_LD_O',ModbusData[ID].LD_OPEN);
+		setDryerDoor(FurnaceID + '_DRYER_LD_C',ModbusData[ID].LD_CLOSED);
+		setDryerDoor(FurnaceID + '_DRYER_UD_O',ModbusData[ID].UD_OPEN);
+		setDryerDoor(FurnaceID + '_DRYER_UD_C',ModbusData[ID].UD_CLOSED);
+		if(ModbusData[ID].DRY_FAN_CB){
+			document.getElementById(FurnaceID + '_DRYER_CB').innerText = 'Circuit Breaker - ON';
+			document.getElementById(FurnaceID + '_DRYER_CB').style.backgroundColor = 'grey';
+			document.getElementById(FurnaceID + '_DRYER_CB').style.color = 'lightgreen';
+		} else {
+			document.getElementById(FurnaceID + '_DRYER_CB').innerText = 'Circuit Breaker - OFF';
+			document.getElementById(FurnaceID + '_DRYER_CB').style.backgroundColor = '';
+			document.getElementById(FurnaceID + '_DRYER_CB').style.color = '';
+		};
+		if(ModbusData[ID].DRY_FAN_FAULT){
+			document.getElementById(FurnaceID + '_DRYER_FAN_BOX_BOT').innerText = 'FAULT';
+			document.getElementById(FurnaceID + '_DRYER_FAN_BOX_BOT').style.color = 'red';
+		} else {
+			document.getElementById(FurnaceID + '_DRYER_FAN_BOX_BOT').innerText = decAdj(ModbusData[ID].DRY_SPEED,10,0) + " %";
+			document.getElementById(FurnaceID + '_DRYER_FAN_BOX_BOT').style.color = '';
+		}
+		if(ModbusData[ID].DRY_FAN_STATE){
+			document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = 'ON';
+			document.getElementById(FurnaceID + '_DRYER_STATUS').style.backgroundColor = 'grey';
+			document.getElementById(FurnaceID + '_DRYER_STATUS').style.color = 'lightgreen';
+		} else {
+			document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = 'OFF';
+			document.getElementById(FurnaceID + '_DRYER_STATUS').style.backgroundColor = '';
+			document.getElementById(FurnaceID + '_DRYER_STATUS').style.color = '';
+		}
+		if(ModbusData[ID].DRY_FAN_AM){
+			document.getElementById(FurnaceID + '_DRYER_MODE').innerText = 'AUTO';
+			document.getElementById(FurnaceID + '_DRYER_MODE').style.backgroundColor = 'green';
+			document.getElementById(FurnaceID + '_DRYER_MODE').style.color = 'black';
+		} else {
+			document.getElementById(FurnaceID + '_DRYER_MODE').innerText = 'MANUAL';
+			document.getElementById(FurnaceID + '_DRYER_MODE').style.backgroundColor = '';
+			document.getElementById(FurnaceID + '_DRYER_MODE').style.color = '';
+		}
+		
+	}
 	document.getElementById(FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK_TEXT').innerHTML = CustomerData[ID].FurnaceID;
 	setBurnerGroup(FurnaceID,'A1',ModbusData[ID].A1_PVALVE,ModbusData[ID].A1_SGAS,ModbusData[ID].A1_FAULT)
 	setBurnerGroup(FurnaceID,'A2',ModbusData[ID].A2_PVALVE,ModbusData[ID].A2_SGAS,ModbusData[ID].A2_FAULT)
@@ -544,6 +608,17 @@ function updateHMI(ID) {
 	setPurgeState(FurnaceID,2,ModbusData[ID].ZBPurge,ModbusData[ID].ZBPComp);
 	setSystemState(FurnaceID,ModbusData[ID].SYS_ON);
 	chartUpdate(ID);
+}
+
+function setDryerDoor(DoorID,DoorStatus){
+	var ThisDoor = document.getElementById(DoorID);
+	if(DoorStatus){
+		ThisDoor.style.color = 'black';
+		ThisDoor.style.backgroundColor = 'green';
+	} else {
+		ThisDoor.style.color = '';
+		ThisDoor.style.backgroundColor = '';
+	};
 }
 
 function defineModbusData(ID){
@@ -758,13 +833,24 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	var LANDING_HMI = document.createElement("div");
 	var LANDING_HMI_CONTROLS = document.createElement("div");
 	var LANDING_HMI_GRAPHICS = document.createElement("div");
+	var LANDING_DRYER = document.createElement("div");
+	var LANDING_DRYER_CONTROLS = document.createElement("div");
+	var LANDING_DRYER_GRAPHICS = document.createElement("div");
+	var LANDING_PARAM = document.createElement("div");
 	var LANDING_TREND = document.createElement("div");
+	var LANDING_TREND_FOREGROUND = document.createElement("div");
 	var LANDINF_TREND_CANVAS = document.createElement("canvas");
 	LANDING.appendChild(LANDING_HMI);
-	LANDING.appendChild(LANDING_TREND);
-	LANDING_TREND.appendChild(LANDINF_TREND_CANVAS);
 	LANDING_HMI.appendChild(LANDING_HMI_CONTROLS);
 	LANDING_HMI.appendChild(LANDING_HMI_GRAPHICS);
+	LANDING.appendChild(LANDING_DRYER);
+	LANDING_DRYER.appendChild(LANDING_DRYER_CONTROLS);
+	LANDING_DRYER.appendChild(LANDING_DRYER_GRAPHICS);
+	LANDING.appendChild(LANDING_PARAM);
+	LANDING.appendChild(LANDING_TREND);
+	LANDING.appendChild(LANDING_TREND_FOREGROUND);
+	LANDING_TREND.appendChild(LANDINF_TREND_CANVAS);
+	
 	LANDING.setAttribute('id',FurnaceID + '_LANDING');
 	LANDING.setAttribute('class','landing');
 	if(!visible){LANDING.setAttribute('style','display:none;');};
@@ -772,88 +858,171 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	LANDING_HMI.setAttribute('class','landing-HMI');
 	LANDING_HMI_CONTROLS.setAttribute('id',FurnaceID + '_LANDING_HMI_CONTROLS');
 	LANDING_HMI_CONTROLS.setAttribute('class','HMI_CONTROLS');
-	LANDING_HMI_CONTROLS.setAttribute('onClick','TopControlsClicked(this);');
+	LANDING_HMI_CONTROLS.setAttribute('onClick','TopControlsClicked(this,false);');
 	LANDING_HMI_GRAPHICS.setAttribute('id',FurnaceID + '_LANDING_HMI_GRAPHICS');
 	LANDING_HMI_GRAPHICS.setAttribute('class','HMI_GRAPHICS');
+	LANDING_DRYER.setAttribute('id',FurnaceID + '_LANDING_DRYER');
+	LANDING_DRYER.setAttribute('class','landing-DRY');
+	LANDING_DRYER_CONTROLS.setAttribute('id',FurnaceID + '_LANDING_DRYER_CONTROLS');
+	LANDING_DRYER_CONTROLS.setAttribute('class','DRY_CONTROLS');
+	LANDING_DRYER_CONTROLS.setAttribute('onClick','TopControlsClicked(this,true);');
+	LANDING_DRYER_GRAPHICS.setAttribute('id',FurnaceID + '_LANDING_DRYER_GRAPHICS');
+	LANDING_DRYER_GRAPHICS.setAttribute('class','DRY_GRAPHICS');
+	LANDING_PARAM.setAttribute('id',FurnaceID + '_LANDING_PARAM');
+	LANDING_PARAM.setAttribute('class','landing-PARAM');
+	LANDING_PARAM.setAttribute('style','display:none;');
 	LANDING_TREND.setAttribute('id',FurnaceID + '_LANDING_TREND');
 	LANDING_TREND.setAttribute('class','landing-TREND');
+	LANDING_TREND.setAttribute('style','display:none;');
+	//LANDING_TREND.setAttribute('onClick','MiddleHMIClicked(this);');
+	
+	LANDING_TREND_FOREGROUND.setAttribute('id',FurnaceID + '_LANDING_TREND_FOREGROUND');
+	LANDING_TREND_FOREGROUND.setAttribute('class','landing-TREND_FOREGROUND');
+	LANDING_TREND_FOREGROUND.setAttribute('style','display:none;');
+	LANDING_TREND_FOREGROUND.setAttribute('onClick','MiddleHMIClicked(this);');
+	
 	LANDINF_TREND_CANVAS.setAttribute('id','myChart');
 	LANDINF_TREND_CANVAS.setAttribute('class','myChart');
 	
 	ParentDiv.appendChild(LANDING);
-	createTopControls(FurnaceID + '_LANDING_HMI_CONTROLS',FurnaceID,IncludeDips);
-	createSections(FurnaceID + '_LANDING_HMI_GRAPHICS',BurnerCount,FurnaceID);
+	createHMIControls(FurnaceID + '_LANDING_HMI_CONTROLS',FurnaceID,IncludeDips);
+	createHMISections(FurnaceID + '_LANDING_HMI_GRAPHICS',BurnerCount,FurnaceID);
+	createDRYERControls(FurnaceID + '_LANDING_DRYER_CONTROLS',FurnaceID,IncludeDips);
+	createDRYERSections(FurnaceID + '_LANDING_DRYER_GRAPHICS',FurnaceID);
 	defineChart();
 }
 
-function TopControlsClicked(ElementData){
+function MiddleHMIClicked(ElementData){
 	var Element_Data = ElementData.id.split('_');
-	var ControlsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI_CONTROLS');
-	var GraphicsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI_GRAPHICS');
+	var HMIWrapper = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI');
+	var HMIControlsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI_CONTROLS');
+	var HMIGraphicsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI_GRAPHICS');
+	var DRYERWrapper = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER');
+	var DRYERControlsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER_CONTROLS');
+	var DRYERGraphicsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER_GRAPHICS');
 	var TrendArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_TREND');
-	if(TopMaximised){
-		console.log("Minimising");
-		GraphicsArea.style.display = '';
-		TrendArea.style.display = '';
-		ControlsArea.className = 'HMI_CONTROLS';
-	}else{
-		console.log("Maximising");
-		GraphicsArea.style.display = 'none';
+	var TrendAreaForeground = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_TREND_FOREGROUND');
+	if(HMITrendMaximised){
+		HMIWrapper.style.display = '';
+		DRYERWrapper.style.display = '';
 		TrendArea.style.display = 'none';
-		ControlsArea.className = 'HMI_CONTROLS_MAX';
+		TrendAreaForeground.style.display = 'none';
+	} else {
+		HMIWrapper.style.display = 'none';
+		DRYERWrapper.style.display = 'none';
+		TrendArea.style.display = '';
+		TrendAreaForeground.style.display = '';
 	};
-	toggleMaxControls(Element_Data[0] + '_' + Element_Data[1]);
+	HMITrendMaximised = !HMITrendMaximised;
+}
+
+function TopControlsClicked(ElementData,isDryer){
+	var Element_Data = ElementData.id.split('_');
+	var HMIWrapper = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI');
+	var HMIControlsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI_CONTROLS');
+	var HMIGraphicsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_HMI_GRAPHICS');
+	var DRYERWrapper = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER');
+	var DRYERControlsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER_CONTROLS');
+	var DRYERGraphicsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER_GRAPHICS');
+	var TrendArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_TREND');
+	if(isDryer){
+		if(TopMaximised){
+			console.log("Minimising");
+			DRYERGraphicsArea.style.display = '';
+			//TrendArea.style.display = '';
+			DRYERControlsArea.className = 'DRY_CONTROLS';
+			HMIWrapper.style.display = '';
+		}else{
+			console.log("Maximising");
+			DRYERGraphicsArea.style.display = 'none';
+			//TrendArea.style.display = 'none';
+			DRYERControlsArea.className = 'DRY_CONTROLS_MAX';
+			HMIWrapper.style.display = 'none';
+		};
+		
+	} else {
+		if(TopMaximised){
+			console.log("Minimising");
+			HMIGraphicsArea.style.display = '';
+			//TrendArea.style.display = '';
+			HMIControlsArea.className = 'HMI_CONTROLS';
+			DRYERWrapper.style.display = '';
+		}else{
+			console.log("Maximising");
+			HMIGraphicsArea.style.display = 'none';
+			//TrendArea.style.display = 'none';
+			HMIControlsArea.className = 'HMI_CONTROLS_MAX';
+			DRYERWrapper.style.display = 'none';
+		};
+	};
+	toggleMaxControls(Element_Data[0] + '_' + Element_Data[1],isDryer);
 	TopMaximised = !TopMaximised;
 }
 
-function toggleMaxControls(FurnaceID){
-	ToggleMaxWrapper(FurnaceID,'ZINC');
-	ToggleMaxWrapper(FurnaceID,'FLUE');
-	ToggleMax(FurnaceID,'ZINCSP');
-	ToggleMax(FurnaceID,'FLUESP');
-	ToggleMax(FurnaceID,'OUTPUT');
-	ToggleMax(FurnaceID,'GASFLOW');
-	ToggleTopRowMax(FurnaceID,1);
-	ToggleBotRowMax(FurnaceID,2);
+function toggleMaxControls(FurnaceID,isDryer){
+	if(isDryer){
+		ToggleMaxWrapper(FurnaceID,'EXCHGIN',isDryer);
+		ToggleMaxWrapper(FurnaceID,'DRYERIN',isDryer);
+		ToggleMax(FurnaceID,'EXCHGSP',isDryer);
+		ToggleMax(FurnaceID,'DRYERSP',isDryer);
+		ToggleMax(FurnaceID,'FANSPEED',isDryer);
+		ToggleMax(FurnaceID,'FANSP',isDryer);
+		
+	} else {
+		ToggleMaxWrapper(FurnaceID,'ZINC',isDryer);
+		ToggleMaxWrapper(FurnaceID,'FLUE',isDryer);
+		ToggleMax(FurnaceID,'ZINCSP',isDryer);
+		ToggleMax(FurnaceID,'FLUESP',isDryer);
+		ToggleMax(FurnaceID,'OUTPUT',isDryer);
+		ToggleMax(FurnaceID,'GASFLOW',isDryer);
+	}
+	ToggleTopRowMax(FurnaceID,1,isDryer);
+	ToggleBotRowMax(FurnaceID,2,isDryer);
 };
 
-function ToggleTopRowMax(FurnaceID,RowNumber){
+function ToggleTopRowMax(FurnaceID,RowNumber,isDryer){
+	if(isDryer){var EXTRA_TXT = 'DRY';} else {var EXTRA_TXT = 'HMI';};
 	if(TopMaximised){
-		classReplace(FurnaceID + '_HMI_CONTROLS_ROW_' + RowNumber,'HMI_ROW_TOP_MAX','HMI_ROW_TOP');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_ROW_' + RowNumber,EXTRA_TXT + '_ROW_TOP_MAX',EXTRA_TXT + '_ROW_TOP');
 	} else {
-		classReplace(FurnaceID + '_HMI_CONTROLS_ROW_' + RowNumber,'HMI_ROW_TOP','HMI_ROW_TOP_MAX');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_ROW_' + RowNumber,EXTRA_TXT + '_ROW_TOP',EXTRA_TXT + '_ROW_TOP_MAX');
 	};
+
 }
 
-function ToggleBotRowMax(FurnaceID,RowNumber){
+function ToggleBotRowMax(FurnaceID,RowNumber,isDryer){
+	if(isDryer){var EXTRA_TXT = 'DRY';} else {var EXTRA_TXT = 'HMI';};
 	if(TopMaximised){
-		classReplace(FurnaceID + '_HMI_CONTROLS_ROW_' + RowNumber,'HMI_ROW_BOT_MAX','HMI_ROW_BOT');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_ROW_' + RowNumber,EXTRA_TXT + '_ROW_BOT_MAX',EXTRA_TXT + '_ROW_BOT');
 	} else {
-		classReplace(FurnaceID + '_HMI_CONTROLS_ROW_' + RowNumber,'HMI_ROW_BOT','HMI_ROW_BOT_MAX');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_ROW_' + RowNumber,EXTRA_TXT + '_ROW_BOT',EXTRA_TXT + '_ROW_BOT_MAX');
+	};
+
+}
+
+function ToggleMaxWrapper(FurnaceID,ElementName,isDryer){
+	if(isDryer){var EXTRA_TXT = 'DRY';} else {var EXTRA_TXT = 'HMI';};
+	if(TopMaximised){
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName + 'TEMP_LABEL',EXTRA_TXT + '_BLOCK_MAX',EXTRA_TXT + '_BLOCK');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName + 'TEMP',EXTRA_TXT + '_DATA_MAX',EXTRA_TXT + '_DATA');
+		classReplace(FurnaceID + '_' + ElementName + 'TEMP_WRAPPER',EXTRA_TXT + '_WRAPPER_MAX',EXTRA_TXT + '_WRAPPER');
+		classReplace(FurnaceID + '_' + ElementName + '_WRAPPER',EXTRA_TXT + '_SECTION_WRAPPER_MAX',EXTRA_TXT + '_SECTION_WRAPPER');
+	}else{
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName + 'TEMP_LABEL',EXTRA_TXT + '_BLOCK',EXTRA_TXT + '_BLOCK_MAX');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName + 'TEMP',EXTRA_TXT + '_DATA',EXTRA_TXT + '_DATA_MAX');
+		classReplace(FurnaceID + '_' + ElementName + 'TEMP_WRAPPER',EXTRA_TXT + '_WRAPPER',EXTRA_TXT + '_WRAPPER_MAX');
+		classReplace(FurnaceID + '_' + ElementName + '_WRAPPER',EXTRA_TXT + '_SECTION_WRAPPER',EXTRA_TXT + '_SECTION_WRAPPER_MAX');
 	};
 }
 
-function ToggleMaxWrapper(FurnaceID,ElementName){
+function ToggleMax(FurnaceID,ElementName,isDryer){
+	if(isDryer){var EXTRA_TXT = 'DRY';} else {var EXTRA_TXT = 'HMI';};
 	if(TopMaximised){
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName + 'TEMP_LABEL','HMI_BLOCK_MAX','HMI_BLOCK');
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName + 'TEMP','HMI_DATA_MAX','HMI_DATA');
-		classReplace(FurnaceID + '_' + ElementName + 'TEMP_WRAPPER','HMI_WRAPPER_MAX','HMI_WRAPPER');
-		classReplace(FurnaceID + '_' + ElementName + '_WRAPPER','HMI_SECTION_WRAPPER_MAX','HMI_SECTION_WRAPPER');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName + '_LABEL',EXTRA_TXT + '_BLOCK_MAX',EXTRA_TXT + '_BLOCK');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName,EXTRA_TXT + '_DATA_MAX',EXTRA_TXT + '_DATA');
 	}else{
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName + 'TEMP_LABEL','HMI_BLOCK','HMI_BLOCK_MAX');
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName + 'TEMP','HMI_DATA','HMI_DATA_MAX');
-		classReplace(FurnaceID + '_' + ElementName + 'TEMP_WRAPPER','HMI_WRAPPER','HMI_WRAPPER_MAX');
-		classReplace(FurnaceID + '_' + ElementName + '_WRAPPER','HMI_SECTION_WRAPPER','HMI_SECTION_WRAPPER_MAX');
-	};
-}
-
-function ToggleMax(FurnaceID,ElementName){
-	if(TopMaximised){
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName + '_LABEL','HMI_BLOCK_MAX','HMI_BLOCK');
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName,'HMI_DATA_MAX','HMI_DATA');
-	}else{
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName + '_LABEL','HMI_BLOCK','HMI_BLOCK_MAX');
-		classReplace(FurnaceID + '_HMI_CONTROLS_' + ElementName,'HMI_DATA','HMI_DATA_MAX');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName + '_LABEL',EXTRA_TXT + '_BLOCK',EXTRA_TXT + '_BLOCK_MAX');
+		classReplace(FurnaceID + '_' + EXTRA_TXT + '_CONTROLS_' + ElementName,EXTRA_TXT + '_DATA',EXTRA_TXT + '_DATA_MAX');
 	};
 }
 
@@ -869,7 +1038,7 @@ function classReplace(ElementID,OldClass,NewClass){
 	};
 }
 
-function createTopControls(ParentDivName,FurnaceID,IncludeDips){
+function createHMIControls(ParentDivName,FurnaceID,IncludeDips){
 	var ParentDiv = document.getElementById(ParentDivName);
 	var HMI_CONTROLS_ROW_1 = document.createElement("div");
 	var HMI_CONTROLS_ROW_2 = document.createElement("div");
@@ -967,7 +1136,201 @@ function createTopControls(ParentDivName,FurnaceID,IncludeDips){
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_GASFLOW_LABEL').innerText = "Gas Flow";
 }
 
-function createSections(ParentDivName,BurnerCount,FurnaceID){
+function createDRYERControls(ParentDivName,FurnaceID,IncludeDips){
+	var ParentDiv = document.getElementById(ParentDivName);
+	var DRY_CONTROLS_ROW_1 = document.createElement("div");
+	var DRY_CONTROLS_ROW_2 = document.createElement("div");
+	var DRY_CONTROLS_EXCHG_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_DRYER_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_EXCHGTEMP_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_DRYERTEMP_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_EXCHGSP_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_DRYERSP_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_FANSPEED_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_FANSP_WRAPPER = document.createElement("div");
+	var DRY_CONTROLS_EXCHGTEMP = document.createElement("div");
+	var DRY_CONTROLS_EXCHGTEMP_LABEL = document.createElement("div");
+	var DRY_CONTROLS_DRYERTEMP = document.createElement("div");
+	var DRY_CONTROLS_DRYERTEMP_LABEL = document.createElement("div");
+	var DRY_CONTROLS_EXCHGSP = document.createElement("div");
+	var DRY_CONTROLS_EXCHGSP_LABEL = document.createElement("div");
+	var DRY_CONTROLS_DRYERSP = document.createElement("div");
+	var DRY_CONTROLS_DRYERSP_LABEL = document.createElement("div");
+	var DRY_CONTROLS_FANSPEED = document.createElement("div");
+	var DRY_CONTROLS_FANSPEED_LABEL = document.createElement("div");
+	var DRY_CONTROLS_FANSP = document.createElement("div");
+	var DRY_CONTROLS_FANSP_LABEL = document.createElement("div");
+	DRY_CONTROLS_EXCHG_WRAPPER.setAttribute('id',FurnaceID + '_EXCHGIN_WRAPPER');
+	DRY_CONTROLS_EXCHG_WRAPPER.setAttribute('class','DRY_SECTION_WRAPPER');
+	DRY_CONTROLS_DRYER_WRAPPER.setAttribute('id',FurnaceID + '_DRYERIN_WRAPPER');
+	DRY_CONTROLS_DRYER_WRAPPER.setAttribute('class','DRY_SECTION_WRAPPER');
+	DRY_CONTROLS_EXCHGTEMP_WRAPPER.setAttribute('id',FurnaceID + '_EXCHGINTEMP_WRAPPER');
+	DRY_CONTROLS_EXCHGTEMP_WRAPPER.setAttribute('class','DRY_WRAPPER');
+	DRY_CONTROLS_DRYERTEMP_WRAPPER.setAttribute('id',FurnaceID + '_DRYERINTEMP_WRAPPER');
+	DRY_CONTROLS_DRYERTEMP_WRAPPER.setAttribute('class','DRY_WRAPPER');
+	DRY_CONTROLS_EXCHGSP_WRAPPER.setAttribute('id',FurnaceID + '_EXCHGSP_WRAPPER');
+	DRY_CONTROLS_EXCHGSP_WRAPPER.setAttribute('class','DRY_WRAPPER');
+	DRY_CONTROLS_DRYERSP_WRAPPER.setAttribute('id',FurnaceID + '_DRYERSP_WRAPPER');
+	DRY_CONTROLS_DRYERSP_WRAPPER.setAttribute('class','DRY_WRAPPER');
+	DRY_CONTROLS_FANSPEED_WRAPPER.setAttribute('id',FurnaceID + '_FANSPEED_WRAPPER');
+	DRY_CONTROLS_FANSPEED_WRAPPER.setAttribute('class','DRY_WRAPPER');
+	DRY_CONTROLS_FANSP_WRAPPER.setAttribute('id',FurnaceID + '_FANSP_WRAPPER');
+	DRY_CONTROLS_FANSP_WRAPPER.setAttribute('class','DRY_WRAPPER');
+	DRY_CONTROLS_ROW_1.setAttribute('id',FurnaceID + '_DRY_CONTROLS_ROW_1');
+	DRY_CONTROLS_ROW_1.setAttribute('class','DRY_ROW_TOP');
+	DRY_CONTROLS_ROW_2.setAttribute('id',FurnaceID + '_DRY_CONTROLS_ROW_2');
+	DRY_CONTROLS_ROW_2.setAttribute('class','DRY_ROW_BOT');
+	DRY_CONTROLS_EXCHGTEMP_LABEL.setAttribute('id',FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP_LABEL');
+	DRY_CONTROLS_EXCHGTEMP_LABEL.setAttribute('class','DRY_BLOCK DRY_EX_TEMP');
+	DRY_CONTROLS_EXCHGTEMP.setAttribute('id',FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP');
+	DRY_CONTROLS_EXCHGTEMP.setAttribute('class','DRY_DATA DRY_CONT_DATA');
+	DRY_CONTROLS_DRYERTEMP_LABEL.setAttribute('id',FurnaceID + '_DRY_CONTROLS_DRYERINTEMP_LABEL');
+	DRY_CONTROLS_DRYERTEMP_LABEL.setAttribute('class','DRY_BLOCK DRY_DRYER_TEMP');
+	DRY_CONTROLS_DRYERTEMP.setAttribute('id',FurnaceID + '_DRY_CONTROLS_DRYERINTEMP');
+	DRY_CONTROLS_DRYERTEMP.setAttribute('class','DRY_DATA DRY_CONT_DATA');
+	DRY_CONTROLS_EXCHGSP_LABEL.setAttribute('id',FurnaceID + '_DRY_CONTROLS_EXCHGSP_LABEL');
+	DRY_CONTROLS_EXCHGSP_LABEL.setAttribute('class','DRY_BLOCK DRY_EX_TEMP');
+	DRY_CONTROLS_EXCHGSP.setAttribute('id',FurnaceID + '_DRY_CONTROLS_EXCHGSP');
+	DRY_CONTROLS_EXCHGSP.setAttribute('class','DRY_DATA DRY_CONT_DATA');
+	DRY_CONTROLS_DRYERSP_LABEL.setAttribute('id',FurnaceID + '_DRY_CONTROLS_DRYERSP_LABEL');
+	DRY_CONTROLS_DRYERSP_LABEL.setAttribute('class','DRY_BLOCK DRY_DRYER_TEMP');
+	DRY_CONTROLS_DRYERSP.setAttribute('id',FurnaceID + '_DRY_CONTROLS_DRYERSP');
+	DRY_CONTROLS_DRYERSP.setAttribute('class','DRY_DATA DRY_CONT_DATA');
+	DRY_CONTROLS_FANSPEED_LABEL.setAttribute('id',FurnaceID + '_DRY_CONTROLS_FANSPEED_LABEL');
+	DRY_CONTROLS_FANSPEED_LABEL.setAttribute('class','DRY_BLOCK DRY_FAN_SPEED');
+	DRY_CONTROLS_FANSPEED.setAttribute('id',FurnaceID + '_DRY_CONTROLS_FANSPEED');
+	DRY_CONTROLS_FANSPEED.setAttribute('class','DRY_DATA DRY_CONT_DATA');
+	DRY_CONTROLS_FANSP_LABEL.setAttribute('id',FurnaceID + '_DRY_CONTROLS_FANSP_LABEL');
+	DRY_CONTROLS_FANSP_LABEL.setAttribute('class','DRY_BLOCK HMI_CONT_SP');
+	DRY_CONTROLS_FANSP.setAttribute('id',FurnaceID + '_DRY_CONTROLS_FANSP');
+	DRY_CONTROLS_FANSP.setAttribute('class','DRY_DATA DRY_CONT_DATA');
+	DRY_CONTROLS_ROW_1.appendChild(DRY_CONTROLS_EXCHG_WRAPPER);
+	DRY_CONTROLS_ROW_1.appendChild(DRY_CONTROLS_DRYER_WRAPPER);
+	DRY_CONTROLS_EXCHG_WRAPPER.appendChild(DRY_CONTROLS_EXCHGTEMP_WRAPPER);
+	DRY_CONTROLS_DRYER_WRAPPER.appendChild(DRY_CONTROLS_DRYERTEMP_WRAPPER);
+	DRY_CONTROLS_EXCHGTEMP_WRAPPER.appendChild(DRY_CONTROLS_EXCHGTEMP_LABEL);
+	DRY_CONTROLS_EXCHGTEMP_WRAPPER.appendChild(DRY_CONTROLS_EXCHGTEMP);
+	DRY_CONTROLS_DRYERTEMP_WRAPPER.appendChild(DRY_CONTROLS_DRYERTEMP_LABEL);
+	DRY_CONTROLS_DRYERTEMP_WRAPPER.appendChild(DRY_CONTROLS_DRYERTEMP);
+	DRY_CONTROLS_EXCHG_WRAPPER.appendChild(DRY_CONTROLS_EXCHGSP_WRAPPER);
+	DRY_CONTROLS_DRYER_WRAPPER.appendChild(DRY_CONTROLS_DRYERSP_WRAPPER);
+	DRY_CONTROLS_EXCHGSP_WRAPPER.appendChild(DRY_CONTROLS_EXCHGSP_LABEL);
+	DRY_CONTROLS_EXCHGSP_WRAPPER.appendChild(DRY_CONTROLS_EXCHGSP);
+	DRY_CONTROLS_DRYERSP_WRAPPER.appendChild(DRY_CONTROLS_DRYERSP_LABEL);
+	DRY_CONTROLS_DRYERSP_WRAPPER.appendChild(DRY_CONTROLS_DRYERSP);
+	DRY_CONTROLS_ROW_2.appendChild(DRY_CONTROLS_FANSPEED_WRAPPER);
+	DRY_CONTROLS_ROW_2.appendChild(DRY_CONTROLS_FANSP_WRAPPER);
+	DRY_CONTROLS_FANSPEED_WRAPPER.appendChild(DRY_CONTROLS_FANSPEED_LABEL);
+	DRY_CONTROLS_FANSPEED_WRAPPER.appendChild(DRY_CONTROLS_FANSPEED);
+	DRY_CONTROLS_FANSP_WRAPPER.appendChild(DRY_CONTROLS_FANSP_LABEL);
+	DRY_CONTROLS_FANSP_WRAPPER.appendChild(DRY_CONTROLS_FANSP);
+	ParentDiv.appendChild(DRY_CONTROLS_ROW_1);
+	ParentDiv.appendChild(DRY_CONTROLS_ROW_2);
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP_LABEL').innerText = "Ex In";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERINTEMP_LABEL').innerText = "Dryer In";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGSP_LABEL').innerText = "Ex Out";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERSP_LABEL').innerText = "Dryer Out";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSPEED_LABEL').innerText = "Fan Speed";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSP_LABEL').innerText = "Setpoint";
+}
+
+function createDRYERSections(ParentDivName,FurnaceID){
+	var ParentDiv = document.getElementById(ParentDivName);
+	var DRYER_SECTION_LEFT = document.createElement("div");
+	var DRYER_SECTION_RIGHT = document.createElement("div");
+	var DRYER_LD_O = document.createElement("div");
+	var DRYER_LD_C = document.createElement("div");
+	var DRYER_UD_O = document.createElement("div");
+	var DRYER_UD_C = document.createElement("div");
+	var DRYER_SECTION_RIGHT_TOP = document.createElement("div");
+	var DRYER_SECTION_RIGHT_MID = document.createElement("div");
+	var DRYER_SECTION_RIGHT_BOT_1 = document.createElement("div");
+	var DRYER_SECTION_RIGHT_BOT_2 = document.createElement("div");
+	var DRYER_CB = document.createElement("div");
+	var DRYER_FAN_BOX_TOP = document.createElement('div');
+	var DRYER_FAN_BOX_BOT = document.createElement('div');
+	var DRYER_FAN_BLADE = document.createElement('img');
+	var DRYER_FAN_COVER = document.createElement('img');
+	var DRYER_STATUS = document.createElement("div");
+	var DRYER_MODE = document.createElement("div");
+	
+	DRYER_SECTION_LEFT.setAttribute('id',FurnaceID + '_DRYER_SECTION_LEFT');
+	DRYER_SECTION_LEFT.setAttribute('class','DRYER_SECTION_LEFT');
+	
+	DRYER_LD_O.setAttribute('id',FurnaceID + '_DRYER_LD_O');
+	DRYER_LD_O.setAttribute('class','DRYER_DOOR');
+	DRYER_LD_C.setAttribute('id',FurnaceID + '_DRYER_LD_C');
+	DRYER_LD_C.setAttribute('class','DRYER_DOOR');
+	DRYER_UD_O.setAttribute('id',FurnaceID + '_DRYER_UD_O');
+	DRYER_UD_O.setAttribute('class','DRYER_DOOR');
+	DRYER_UD_C.setAttribute('id',FurnaceID + '_DRYER_UD_C');
+	DRYER_UD_C.setAttribute('class','DRYER_DOOR');
+	
+	DRYER_SECTION_RIGHT.setAttribute('id',FurnaceID + '_DRYER_SECTION_RIGHT');
+	DRYER_SECTION_RIGHT.setAttribute('class','DRYER_SECTION_RIGHT');
+	
+	DRYER_SECTION_RIGHT_TOP.setAttribute('id',FurnaceID + '_DRYER_SECTION_RIGHT_TOP');
+	DRYER_SECTION_RIGHT_TOP.setAttribute('class','DRYER_SECTION_RIGHT_TOP');
+	DRYER_SECTION_RIGHT_MID.setAttribute('id',FurnaceID + '_DRYER_SECTION_RIGHT_MID');
+	DRYER_SECTION_RIGHT_MID.setAttribute('class','DRYER_SECTION_RIGHT_MID');
+	DRYER_SECTION_RIGHT_BOT_1.setAttribute('id',FurnaceID + '_DRYER_SECTION_RIGHT_BOT_1');
+	DRYER_SECTION_RIGHT_BOT_1.setAttribute('class','DRYER_SECTION_RIGHT_BOT');
+	DRYER_SECTION_RIGHT_BOT_2.setAttribute('id',FurnaceID + '_DRYER_SECTION_RIGHT_BOT_2');
+	DRYER_SECTION_RIGHT_BOT_2.setAttribute('class','DRYER_SECTION_RIGHT_BOT');
+	
+	DRYER_CB.setAttribute('id',FurnaceID + '_DRYER_CB');
+	DRYER_CB.setAttribute('class','DRYER_CB');
+	
+	DRYER_FAN_BOX_TOP.setAttribute('id',FurnaceID + '_DRYER_FAN_BOX_TOP');
+	DRYER_FAN_BOX_TOP.setAttribute('class','DRYER_FAN_BOX_TOP');
+	DRYER_FAN_BOX_BOT.setAttribute('id',FurnaceID + '_DRYER_FAN_BOX_BOT');
+	DRYER_FAN_BOX_BOT.setAttribute('class','DRYER_FAN_BOX_BOT');
+
+	DRYER_FAN_BLADE.setAttribute('id',FurnaceID + '_DRYER_FAN_BLADE');
+	DRYER_FAN_BLADE.setAttribute('src',getFanSvg());
+	DRYER_FAN_BLADE.setAttribute('alt','Dryer Fan');
+	DRYER_FAN_BLADE.setAttribute('class','fan Dryerfan');
+	
+	DRYER_FAN_COVER.setAttribute('id',FurnaceID + '_DRYER_FAN_COVER');
+	DRYER_FAN_COVER.setAttribute('src',getPipeSvg());
+	DRYER_FAN_COVER.setAttribute('alt','Dryer Fan Ring');
+	DRYER_FAN_COVER.setAttribute('class','Ring1');
+	
+	DRYER_STATUS.setAttribute('id',FurnaceID + '_DRYER_STATUS');
+	DRYER_STATUS.setAttribute('class','DRYER_STATUS');
+	
+	DRYER_MODE.setAttribute('id',FurnaceID + '_DRYER_MODE');
+	DRYER_MODE.setAttribute('class','DRYER_MODE');
+	
+	ParentDiv.appendChild(DRYER_SECTION_LEFT);
+	DRYER_SECTION_LEFT.appendChild(DRYER_LD_O);
+	DRYER_SECTION_LEFT.appendChild(DRYER_LD_C);
+	DRYER_SECTION_LEFT.appendChild(DRYER_UD_O);
+	DRYER_SECTION_LEFT.appendChild(DRYER_UD_C);
+	ParentDiv.appendChild(DRYER_SECTION_RIGHT);
+	DRYER_SECTION_RIGHT.appendChild(DRYER_SECTION_RIGHT_TOP);
+	DRYER_SECTION_RIGHT.appendChild(DRYER_SECTION_RIGHT_MID);
+	DRYER_SECTION_RIGHT.appendChild(DRYER_SECTION_RIGHT_BOT_1);
+	DRYER_SECTION_RIGHT.appendChild(DRYER_SECTION_RIGHT_BOT_2);
+	DRYER_SECTION_RIGHT_TOP.appendChild(DRYER_CB);
+	DRYER_SECTION_RIGHT_MID.appendChild(DRYER_FAN_BOX_TOP);
+	DRYER_SECTION_RIGHT_MID.appendChild(DRYER_FAN_BOX_BOT);
+	DRYER_FAN_BOX_TOP.appendChild(DRYER_FAN_BLADE);
+	DRYER_FAN_BOX_TOP.appendChild(DRYER_FAN_COVER);
+	DRYER_SECTION_RIGHT_BOT_1.appendChild(DRYER_STATUS);
+	DRYER_SECTION_RIGHT_BOT_2.appendChild(DRYER_MODE);
+	
+	document.getElementById(FurnaceID + '_DRYER_LD_O').innerText = 'LOAD DOOR - OPEN';
+	document.getElementById(FurnaceID + '_DRYER_LD_C').innerText = 'LOAD DOOR - CLOSED';
+	document.getElementById(FurnaceID + '_DRYER_UD_O').innerText = 'UNLOAD DOOR - OPEN';
+	document.getElementById(FurnaceID + '_DRYER_UD_C').innerText = 'UNLOAD DOOR - CLOSED';
+	document.getElementById(FurnaceID + '_DRYER_CB').innerText = 'Circuit Breaker - OFF';
+	document.getElementById(FurnaceID + '_DRYER_FAN_BOX_BOT').innerText = '0%';
+	document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = 'OFF';
+	document.getElementById(FurnaceID + '_DRYER_MODE').innerText = 'MANUAL';
+}
+
+function createHMISections(ParentDivName,BurnerCount,FurnaceID){
 	var ParentDiv = document.getElementById(ParentDivName);
 	var HMI_SECTION_LEFT = document.createElement("div");
 	var HMI_SECTION_LEFT_TOP = document.createElement("div");
@@ -976,6 +1339,7 @@ function createSections(ParentDivName,BurnerCount,FurnaceID){
 	var HMI_SECTION_MIDDLE_TOP = document.createElement("div");
 	var HMI_SECTION_MIDDLE_TOP_SYS = document.createElement("div");
 	var HMI_SECTION_MIDDLE_TOP_BACK = document.createElement("div");
+	var HMI_SECTION_MIDDLE_TOP_FORGROUND = document.createElement("div");
 	var HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE = document.createElement("div");
 	var HMI_SECTION_MIDDLE_TOP_BACK_TEXT = document.createElement("div");
 	var HMI_SECTION_MIDDLE_TOP_LEFT = document.createElement("div");
@@ -1029,6 +1393,12 @@ function createSections(ParentDivName,BurnerCount,FurnaceID){
 	HMI_SECTION_MIDDLE_TOP_SYS.setAttribute('class','HMI_SECTION_MIDDLE_TOP_SYS');
 	HMI_SECTION_MIDDLE_TOP_BACK.setAttribute('id',FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK');
 	HMI_SECTION_MIDDLE_TOP_BACK.setAttribute('class','HMI_TOP_BACK');
+	//HMI_SECTION_MIDDLE_TOP_BACK.setAttribute('onClick','MiddleHMIClicked(this);');
+	
+	HMI_SECTION_MIDDLE_TOP_FORGROUND.setAttribute('id',FurnaceID + '_HMI_SECTION_MIDDLE_TOP_FOREGROUND');
+	HMI_SECTION_MIDDLE_TOP_FORGROUND.setAttribute('class','HMI_TOP_FOREGROUND');
+	HMI_SECTION_MIDDLE_TOP_FORGROUND.setAttribute('onClick','MiddleHMIClicked(this);');
+	
 	HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE.setAttribute('id',FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE');
 	HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE.setAttribute('class','HMI_TOP_BACK_MIDDLE');
 	HMI_SECTION_MIDDLE_TOP_BACK_TEXT.setAttribute('id',FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK_TEXT');
@@ -1111,6 +1481,7 @@ function createSections(ParentDivName,BurnerCount,FurnaceID){
 	};
 	var BACK_WRAPPER = document.getElementById(FurnaceID + '_BACK_WRAPPER');
 	BACK_WRAPPER.appendChild(HMI_SECTION_MIDDLE_TOP_BACK);
+	BACK_WRAPPER.appendChild(HMI_SECTION_MIDDLE_TOP_FORGROUND);
 	HMI_SECTION_MIDDLE_TOP_BACK.appendChild(HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE);
 	HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE.appendChild(HMI_SECTION_MIDDLE_TOP_BACK_TEXT);
 	
@@ -1630,6 +2001,10 @@ function getFanSvg(){
 
 function getPipeSvg(){
 	return "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgd2lkdGg9IjEzMG1tIgogICBoZWlnaHQ9IjEzMG1tIgogICB2aWV3Qm94PSIwIDAgMTMwIDEzMCIKICAgdmVyc2lvbj0iMS4xIgogICBpZD0ic3ZnNjAiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuMC4yLTIgKGU4NmM4NzA4NzksIDIwMjEtMDEtMTUpIgogICBzb2RpcG9kaTpkb2NuYW1lPSJwaXBlLnN2ZyI+CiAgPGRlZnMKICAgICBpZD0iZGVmczU0Ij4KICAgIDxmaWx0ZXIKICAgICAgIGlua3NjYXBlOmNvbGxlY3Q9ImFsd2F5cyIKICAgICAgIHN0eWxlPSJjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM6c1JHQiIKICAgICAgIGlkPSJmaWx0ZXI5MTMiCiAgICAgICB4PSItMC4wMDAzMDY5Mzc5OSIKICAgICAgIHdpZHRoPSIxLjAwMDYxMzkiCiAgICAgICB5PSItMC4wMDAzOTg1NjEyNyIKICAgICAgIGhlaWdodD0iMS4wMDA3OTcyIj4KICAgICAgPGZlR2F1c3NpYW5CbHVyCiAgICAgICAgIGlua3NjYXBlOmNvbGxlY3Q9ImFsd2F5cyIKICAgICAgICAgc3RkRGV2aWF0aW9uPSIwLjAwMjUwNTYxMzIiCiAgICAgICAgIGlkPSJmZUdhdXNzaWFuQmx1cjkxNSIgLz4KICAgIDwvZmlsdGVyPgogICAgPGZpbHRlcgogICAgICAgaW5rc2NhcGU6Y29sbGVjdD0iYWx3YXlzIgogICAgICAgc3R5bGU9ImNvbG9yLWludGVycG9sYXRpb24tZmlsdGVyczpzUkdCIgogICAgICAgaWQ9ImZpbHRlcjkxMy0wIgogICAgICAgeD0iLTAuMDAwMzA2OTM3OTkiCiAgICAgICB3aWR0aD0iMS4wMDA2MTM5IgogICAgICAgeT0iLTAuMDAwMzk4NTYxMjciCiAgICAgICBoZWlnaHQ9IjEuMDAwNzk3MiI+CiAgICAgIDxmZUdhdXNzaWFuQmx1cgogICAgICAgICBpbmtzY2FwZTpjb2xsZWN0PSJhbHdheXMiCiAgICAgICAgIHN0ZERldmlhdGlvbj0iMC4wMDI1MDU2MTMyIgogICAgICAgICBpZD0iZmVHYXVzc2lhbkJsdXI5MTUtMiIgLz4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9ImJhc2UiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2IgogICAgIGJvcmRlcm9wYWNpdHk9IjEuMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6em9vbT0iMS4wNjcxNTI4IgogICAgIGlua3NjYXBlOmN4PSIyMzUuNjczODUiCiAgICAgaW5rc2NhcGU6Y3k9IjI4My40NjQ1NyIKICAgICBpbmtzY2FwZTpkb2N1bWVudC11bml0cz0ibW0iCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ibGF5ZXIxIgogICAgIGlua3NjYXBlOmRvY3VtZW50LXJvdGF0aW9uPSIwIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE0NDAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iODM3IgogICAgIGlua3NjYXBlOndpbmRvdy14PSItOCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTgiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIgLz4KICA8bWV0YWRhdGEKICAgICBpZD0ibWV0YWRhdGE1NyI+CiAgICA8cmRmOlJERj4KICAgICAgPGNjOldvcmsKICAgICAgICAgcmRmOmFib3V0PSIiPgogICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2Uvc3ZnK3htbDwvZGM6Zm9ybWF0PgogICAgICAgIDxkYzp0eXBlCiAgICAgICAgICAgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4KICAgICAgICA8ZGM6dGl0bGUgLz4KICAgICAgPC9jYzpXb3JrPgogICAgPC9yZGY6UkRGPgogIDwvbWV0YWRhdGE+CiAgPGcKICAgICBpbmtzY2FwZTpsYWJlbD0iTGF5ZXIgMSIKICAgICBpbmtzY2FwZTpncm91cG1vZGU9ImxheWVyIgogICAgIGlkPSJsYXllcjEiPgogICAgPHBhdGgKICAgICAgIGlkPSJyZWN0ODM1IgogICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6NDguNTAyMztzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxO2ZpbHRlcjp1cmwoI2ZpbHRlcjkxMykiCiAgICAgICBkPSJNIDI0NS43NDYwOSA2Ni4xODc1IEwgMjQ1Ljc0NjA5IDY5LjkyMTg3NSBBIDE3NS43NDgwMyAxNzUuNzQ4MDMgMCAwIDEgNDA4LjQ3ODUyIDE3OS40ODI0MiBMIDQ5MS4yNjE3MiAxNzkuNDgyNDIgTCA0OTEuMjYxNzIgNjYuMTg3NSBMIDI0NS43NDYwOSA2Ni4xODc1IHogIgogICAgICAgdHJhbnNmb3JtPSJzY2FsZSgwLjI2NDU4MzMzKSIgLz4KICAgIDxwYXRoCiAgICAgICBpZD0icmVjdDgzNS02IgogICAgICAgc3R5bGU9ImZpbGw6IzAwMDAwMDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6NDguNTAyNTtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxO2ZpbHRlcjp1cmwoI2ZpbHRlcjkxMy0wKSIKICAgICAgIGQ9Ik0gMC4wNzYxNzE4NzUgMzExLjg1NTQ3IEwgMC4wNzYxNzE4NzUgNDI1LjE1MDM5IEwgMjQ1LjU5NTcgNDI1LjE1MDM5IEwgMjQ1LjU5NTcgNDIxLjQxNzk3IEEgMTc1Ljc0ODAzIDE3NS43NDgwMyAwIDAgMSA4Mi44NjEzMjggMzExLjg1NTQ3IEwgMC4wNzYxNzE4NzUgMzExLjg1NTQ3IHogIgogICAgICAgdHJhbnNmb3JtPSJzY2FsZSgwLjI2NDU4MzMzKSIgLz4KICA8L2c+Cjwvc3ZnPgo="
+}
+
+function getLogoSvg(){
+	return "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB3aWR0aD0iMTQ0LjcyNzA3bW0iCiAgIGhlaWdodD0iNzguMDUxODhtbSIKICAgdmlld0JveD0iMCAwIDE0NC43MjcwNyA3OC4wNTE4NzkiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2Zzk4NzYiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuMS4xICgzYmY1YWUwZDI1LCAyMDIxLTA5LTIwKSIKICAgc29kaXBvZGk6ZG9jbmFtZT0ibG9nby5zdmciCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXc5ODc4IgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiIKICAgICBib3JkZXJvcGFjaXR5PSIxLjAiCiAgICAgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZG9jdW1lbnQtdW5pdHM9Im1tIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBpbmtzY2FwZTpzbmFwLWludGVyc2VjdGlvbi1wYXRocz0idHJ1ZSIKICAgICBpbmtzY2FwZTp6b29tPSIxLjgzNDE0NDYiCiAgICAgaW5rc2NhcGU6Y3g9IjI4OS43ODA4NiIKICAgICBpbmtzY2FwZTpjeT0iMTUwLjIwNjI2IgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSI5OTEiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii05IgogICAgIGlua3NjYXBlOndpbmRvdy15PSItOSIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImxheWVyNiIKICAgICBmaXQtbWFyZ2luLXRvcD0iMCIKICAgICBmaXQtbWFyZ2luLWxlZnQ9IjAiCiAgICAgZml0LW1hcmdpbi1yaWdodD0iMCIKICAgICBmaXQtbWFyZ2luLWJvdHRvbT0iMCIgLz4KICA8ZGVmcwogICAgIGlkPSJkZWZzOTg3MyIgLz4KICA8ZwogICAgIGlua3NjYXBlOmdyb3VwbW9kZT0ibGF5ZXIiCiAgICAgaWQ9ImxheWVyNSIKICAgICBpbmtzY2FwZTpsYWJlbD0iUG9seSIKICAgICBzdHlsZT0iZGlzcGxheTpub25lIgogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0wLjY2MTQ1ODQ5LC0wLjM5OTYyODUyKSIKICAgICBzb2RpcG9kaTppbnNlbnNpdGl2ZT0idHJ1ZSI+CiAgICA8cGF0aAogICAgICAgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLW9wYWNpdHk6MDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4yNjQ1ODNweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIgogICAgICAgZD0ibSAxNy44NTkzNjcsMTkuNTg0NjIgdiA5LjQxMDUwNCBIIDMyLjg2MDY5OSBMIDc5Ljc5MTUzNSwwLjUzMTkyMDAyIEggMy42MDYzNTg3IDAuNzkzNzQ5OTkgViA3OC4zMTkyMTQgbCA1MC45NzQ0MzEwMSwtM2UtNiA1OC4yMDYwOTksLTM1LjMwMTU2OCBoIDE4LjIxNjM1IFYgMzMuNDcyMDQ4IEggMTA3LjcyMDY4IEwgNDcuOTUzNjYsNjkuNzIwMzA2IEggOS4yNTgxNjgxIFYgOS4yNTk1Mzk1IEggNDcuMDIyMDg1IEwgMzAuMjIwNTc4LDE5LjQ0OTUyOSBaIgogICAgICAgaWQ9InBhdGgxMjE4MiIKICAgICAgIHNvZGlwb2RpOm5vZGV0eXBlcz0iY2NjY2NjY2NjY2NjY2NjY2NjIiAvPgogICAgPHBhdGgKICAgICAgIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMjY0NTgzcHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIKICAgICAgIGQ9Im0gMTguMjU2MjQ4LDM1Ljk4NTk4OSB2IDkuNTQ1NTkzIEggMzguNDI2NTA2IEwgOTguMjMyNzUsOS4yNTk1Mzk1IGggMzguNDI0NTMgViA2OS43MjAzMDYgSCA5OC43NzU0MzEgTCAxMTUuNTM4NTMsNTkuNTUzNjEyIGggMTIuNzg0MzkgViA1MC4wMDgwMTcgSCAxMTIuOTMyMiBsIC00Ni42ODAxOTgsMjguMzExMTk0IDc5LjAwNDIzOCwzZS02IFYgMC41MzE5MjAwMiBIIDk0LjY0NDM3OCBMIDM2LjE4NjgzNSwzNS45ODU5ODkgWiIKICAgICAgIGlkPSJwYXRoMTI4MjQiIC8+CiAgICA8cGF0aAogICAgICAgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4yNjQ1ODNweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIgogICAgICAgZD0ibSAxOC4zODg1NCw1Mi41MjE5NTggdiA5LjU0NTU5MiBoIDI2LjIyNTkzIGwgNTguNjc1NjgsLTM1LjU4NjM2NSBoIDI0LjUwMzYgViAxNi45MzU1OTEgSCAxMDEuMTExMzEgTCA0Mi40MzU2MjYsNTIuNTIxOTU4IEggMTguMzg4NTQiCiAgICAgICBpZD0icGF0aDEyOTY3IiAvPgogIDwvZz4KICA8ZwogICAgIGlua3NjYXBlOmdyb3VwbW9kZT0ibGF5ZXIiCiAgICAgaWQ9ImxheWVyNiIKICAgICBpbmtzY2FwZTpsYWJlbD0iRmlsbCIKICAgICBzb2RpcG9kaTppbnNlbnNpdGl2ZT0idHJ1ZSIKICAgICBzdHlsZT0iZGlzcGxheTppbmxpbmUiPgogICAgPHBhdGgKICAgICAgIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiMwMDM1NWQ7ZmlsbC1vcGFjaXR5OjE7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuNTQ1MjEzO3N0cm9rZS1vcGFjaXR5OjEiCiAgICAgICBkPSJNIDEuMDkwNDI2NiwxNDcuNDgwMTkgViAxLjA5MDQyNjYgSCAxNDguNjkxOTQgYyAxMjMuOTcxNjQsMCAxNDcuNDI5MzMsMC4xMTc2NTc4IDE0Ni41MjYwNywwLjczNDkzNzYgLTAuNTkxNDksMC40MDQyMTU2IC0zOS45ODQ3MiwyNC4zMjU0NDg4IC04Ny41NDA1LDUzLjE1ODI5NTggbCAtODYuNDY1MDUsNTIuNDIzMzYgSCA5My41OTE2MjkgNjUuOTcwODA4IFYgOTAuMjY5ODAzIDczLjEzMjU4MiBsIDIzLjAzNTI2MSwtMC4xNzMzMDEgMjMuMDM1MjYxLC0wLjE3MzMwNyAzMS44OTQ5OCwtMTkuMjk2NzAxIGMgMTcuNTQyMjQsLTEwLjYxMzE4NiAzMi4yNTQyMywtMTkuNjI5NjUxIDMyLjY5MzMzLC0yMC4wMzY1ODkgMC42NzI1OCwtMC42MjMzMzIgLTEwLjY4NjA5LC0wLjczOTg4NyAtNzIuMTA0NDYsLTAuNzM5ODg3IEggMzEuNjIyMzcxIHYgMTE1LjA0MDAwMyAxMTUuMDQgbCA3My43NDAwOTksLTAuMDA2IDczLjc0MDA5LC0wLjAwNiAxMTIuODAxNTQsLTY4LjQxODE1IDExMi44MDE1MywtNjguNDE4MTcgaCAzOC4zNTg4NiAzOC4zNTg4NCB2IDE3LjE3NDIyIDE3LjE3NDIyIGggLTM0LjI4NjM3IC0zNC4yODYzNyBsIC0xMTAuMTIzOTEsNjYuNzg4NjIgLTExMC4xMjM5LDY2Ljc4ODYzIEggOTYuODQ2NjAxIDEuMDkwNDI2NiBaIgogICAgICAgaWQ9InBhdGgyNTk1MyIKICAgICAgIHRyYW5zZm9ybT0ic2NhbGUoMC4yNjQ1ODMzMykiIC8+CiAgICA8cGF0aAogICAgICAgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzAwMzU1ZDtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC41NDUyMTM7c3Ryb2tlLW9wYWNpdHk6MSIKICAgICAgIGQ9Im0gMjUyLjk3ODk3LDI5Mi4zODk4NCBjIDEuMzQ5NCwtMC44MDgzOSA0MC41OTgwMiwtMjQuNjA0NjMgODcuMjE5MTUsLTUyLjg4MDUzIGwgODQuNzY1NjksLTUxLjQxMDczIGggMjguNTAyMzcgMjguNTAyMzcgdiAxNy40NDY4MyAxNy40NDY4MiBIIDQ1Ny43NDgwNyA0MzMuNTI3NiBsIC0zMi4wNzI4LDE5LjQyOTIgYyAtMTcuNjQwMDQsMTAuNjg2MDYgLTMyLjMwNTg4LDE5LjY0MTE5IC0zMi41OTA3NSwxOS45MDAyOCAtMC4yOTEyMywwLjI2NDg4IDMxLjUxMDExLDAuNDcxMDkgNzIuNjQ5NjcsMC40NzEwOSBoIDczLjE2NzYyIFYgMTQ3Ljc1MjggMzIuNzEyNzk3IEggNDQxLjU2NTU1IDM2OC40NDk3NyBMIDI1NS42MzU2NCwxMDEuMTM3MDYgMTQyLjgyMTUyLDE2OS41NjEzMyBIIDEwNC45NDEzOCA2Ny4wNjEyMzQgViAxNTIuMzg3MTEgMTM1LjIxMjkgaCAzMy44MzE0NzYgMzMuODMxNDggTCAyNDUuMjk1MTEsNjguMTUxNjYxIDM1NS44NjYwNCwxLjA5MDQyNjYgaCA5NC45NDYyMyA5NC45NDYyMyBWIDE0Ny40ODAxOSAyOTMuODY5OTYgbCAtMTQ3LjYxNjUsLTAuMDA1IC0xNDcuNjE2NDksLTAuMDA1IDIuNDUzNDYsLTEuNDY5ODEgeiIKICAgICAgIGlkPSJwYXRoMjU5OTIiCiAgICAgICB0cmFuc2Zvcm09InNjYWxlKDAuMjY0NTgzMzMpIiAvPgogICAgPHBhdGgKICAgICAgIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNhZWFmYjM7ZmlsbC1vcGFjaXR5OjE7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuNTQ1MjEzO3N0cm9rZS1vcGFjaXR5OjEiCiAgICAgICBkPSJtIDY3LjYwNjQ0OCwyMTUuMDg2NjQgdiAtMTcuMTc0MjIgaCA0NS4yMDM3OTIgNDUuMjAzNzkgTCAyNjkuMDMwNzksMTMwLjU3ODU4IDM4MC4wNDc1NSw2My4yNDQ3NDEgaCA0OS44NzAwNyA0OS44NzAwNyBWIDgwLjQxODk2IDk3LjU5MzE3OCBoIC00NS45NDAxNiAtNDUuOTQwMTYgbCAtMTExLjAxNDMsNjcuMzMzODQyIC0xMTEuMDE0Myw2Ny4zMzM4NCBIIDExNi43NDI2MSA2Ny42MDY0NDggWiIKICAgICAgIGlkPSJwYXRoMjYwMzEiCiAgICAgICB0cmFuc2Zvcm09InNjYWxlKDAuMjY0NTgzMzMpIiAvPgogIDwvZz4KPC9zdmc+Cg=="
 }
 
 'use strict';
