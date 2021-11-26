@@ -1,4 +1,4 @@
-const ModbusData = [];
+const ModbusData = []; 
 const CustomerData = [];
 var SampleCount = 3;
 var pulseFlag = false;
