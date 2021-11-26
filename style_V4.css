@@ -292,8 +292,7 @@
 .landing-TREND {
 	position: relative;
 	display: flex;
-	flex: 0 1 50vw;
-	height: var(--port_height);
+	height: 100vh;
 	justify-content: center;
 	align-items: center;
 	text-align: center;
@@ -302,8 +301,7 @@
 .landing-TREND_FOREGROUND {
 	position: absolute;
     display: flex;
-    flex: 0 1 50vw;
-    height: var(--port_height);
+    height: 4%;
     z-index: 100;
     width: 100%;
     top: 0;
@@ -1415,12 +1413,12 @@
 
 .landing-TREND {
 	height: var(--land_height);
-	width:50vw;
+	width:100vw;
 }
   
 .landing-TREND_FOREGROUND {
-	height: var(--land_height);
-	width:50vw;
+	height: 4%;
+	width:100vw;
 }
   
 .DRYER_DOOR{
