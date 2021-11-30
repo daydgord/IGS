@@ -521,10 +521,10 @@ function updateHMI(ID) {
 			calcSpeed = (110 - ModbusData[ID].DRY_SPEED)/10
 		};
 		document.documentElement.style.setProperty('--fan-dryer-speed', calcSpeed.toFixed(1) + 's');
-		document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP').innerHTML = decAdj(ModbusData[ID].EX_IN,10,1) + " °C";
-		document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGSP').innerHTML = decAdj(ModbusData[ID].EX_OUT,10,1) + " °C";
-		document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERINTEMP').innerHTML = decAdj(ModbusData[ID].DRY_IN,10,1) + " °C";
-		document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERSP').innerHTML = decAdj(ModbusData[ID].DRY_OUT,10,1) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP').innerHTML = decAdj(ModbusData[ID].EX_IN,10,0) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGSP').innerHTML = decAdj(ModbusData[ID].EX_OUT,10,0) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERINTEMP').innerHTML = decAdj(ModbusData[ID].DRY_IN,10,0) + " °C";
+		document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERSP').innerHTML = decAdj(ModbusData[ID].DRY_OUT,10,0) + " °C";
 		document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSPEED').innerHTML = decAdj(ModbusData[ID].DRY_SPEED,10,0) + " %";
 		document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSP').innerHTML = decAdj(ModbusData[ID].DRY_SP,10,0) + " °C";
 		setDryerDoor(FurnaceID + '_DRYER_LD_O',ModbusData[ID].LD_OPEN);
