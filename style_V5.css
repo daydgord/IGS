@@ -338,6 +338,7 @@
     justify-content: center;
     align-items: center;
     margin: 1%;
+    font-size: 1.2rem;
 }
 
 .DRYER_SECTION_RIGHT_TOP{
@@ -1422,7 +1423,7 @@
 }
   
 .DRYER_DOOR{
-	font-size:2vw;
+	font-size:2rem;
 }
   
 .DRYER_CB{
