@@ -1442,17 +1442,17 @@ function createHMISections(ParentDivName,BurnerCount,FurnaceID){
 			};
 		if(i==BurnerCalc){
 			switch (BurnerCount/2){
-				case 12:
+				case 6:
 					createBurnerGroupSpacer(FurnaceID,HeightVal,0,true);
 					HeightVal3 = HeightVal2 + 5;
 					BackWrapper = true;
 					break;
-				case 8:
+				case 4:
 					createBurnerGroupSpacer(FurnaceID,HeightVal,0,true);  // was 2
 					HeightVal3 = HeightVal2 + 5;
 					BackWrapper = true;
 					break;
-				case 4:
+				case 2:
 					createBurnerGroupSpacer(FurnaceID,HeightVal,0,true);  // was 4
 					HeightVal3 = HeightVal2 + 5;
 					BackWrapper = true;
