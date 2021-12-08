@@ -1,4 +1,4 @@
-const ModbusData = []; 
+const ModbusData = [];
 const CustomerData = [];
 var SampleCount = 3;
 var pulseFlag = false;
@@ -426,6 +426,28 @@ function decodeBurner(ID,BurnerID){
 			ModbusData[ID].B4_PRESS = 	thisArray[6];
 			ModbusData[ID].B4_PVALVE = 	thisArray[7];
 			break;
+		case 5:
+			var thisArray = INTOTBOOL(ModbusData[ID].BURNER_5_INT);
+			ModbusData[ID].A5_FAULT = 	thisArray[0];
+			ModbusData[ID].A5_SGAS = 	thisArray[1];
+			ModbusData[ID].A5_PRESS = 	thisArray[2];
+			ModbusData[ID].A5_PVALVE = 	thisArray[3];
+			ModbusData[ID].B5_FAULT = 	thisArray[4];
+			ModbusData[ID].B5_SGAS = 	thisArray[5];
+			ModbusData[ID].B5_PRESS = 	thisArray[6];
+			ModbusData[ID].B5_PVALVE = 	thisArray[7];
+			break;
+		case 6:
+			var thisArray = INTOTBOOL(ModbusData[ID].BURNER_6_INT);
+			ModbusData[ID].A6_FAULT = 	thisArray[0];
+			ModbusData[ID].A6_SGAS = 	thisArray[1];
+			ModbusData[ID].A6_PRESS = 	thisArray[2];
+			ModbusData[ID].A6_PVALVE = 	thisArray[3];
+			ModbusData[ID].B6_FAULT = 	thisArray[4];
+			ModbusData[ID].B6_SGAS = 	thisArray[5];
+			ModbusData[ID].B6_PRESS = 	thisArray[6];
+			ModbusData[ID].B6_PVALVE = 	thisArray[7];
+			break;
 	}
 	
 }
@@ -478,6 +500,8 @@ function updateHMI(ID) {
 	decodeBurner(ID,2);
 	decodeBurner(ID,3);
 	decodeBurner(ID,4);
+	decodeBurner(ID,5);
+	decodeBurner(ID,6);
 	decodeZone(ID,1);
 	decodeZone(ID,2);
 	decodeSystem(ID);
