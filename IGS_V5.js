@@ -43,6 +43,8 @@ function GetArduinoInputs(){
 						ModbusData[0].BURNER_2_INT = this.responseXML.getElementsByTagName('burner2')[0].childNodes[0].nodeValue;
 						ModbusData[0].BURNER_3_INT = this.responseXML.getElementsByTagName('burner3')[0].childNodes[0].nodeValue;
 						ModbusData[0].BURNER_4_INT = this.responseXML.getElementsByTagName('burner4')[0].childNodes[0].nodeValue;
+						ModbusData[0].BURNER_5_INT = this.responseXML.getElementsByTagName('burner5')[0].childNodes[0].nodeValue;
+						ModbusData[0].BURNER_6_INT = this.responseXML.getElementsByTagName('burner6')[0].childNodes[0].nodeValue;
 						ModbusData[0].ZONE_A_INT = this.responseXML.getElementsByTagName('zoneA')[0].childNodes[0].nodeValue;
 						ModbusData[0].ZONE_B_INT = this.responseXML.getElementsByTagName('zoneB')[0].childNodes[0].nodeValue;
 						ModbusData[0].SYS_INT = this.responseXML.getElementsByTagName('system')[0].childNodes[0].nodeValue;
@@ -644,6 +646,8 @@ function defineModbusData(ID){
 		BURNER_2_INT:0,
 		BURNER_3_INT:0,
 		BURNER_4_INT:0,
+		BURNER_5_INT:0,
+		BURNER_6_INT:0,
 		ZONE_A_INT:0,
 		ZONE_B_INT:0,
 		SYS_INT:0,
