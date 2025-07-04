@@ -1,0 +1,1776 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+
+:root {
+	--disabled-grey: #e6e6e6;
+	--child-window-border: black;
+	--child-window-border-size: 1px;
+	--main-background: white;
+	--child-window-title: #e6e6e6;
+	--child-window-title-active: #cccccc;
+	--child-window-close-hover: red;
+	--child-window-close-active: #ff9999;
+	--child-window-close-hover-font: white;
+	--child-window-close: white;
+	--child-window-ctrl-hover: #e6e6e6;
+	--child-window-ctrl-active: #cccccc;
+	--child-window-ctrl: white;
+	--child-window-background: white;
+	--child-window-shadow-size: 5px;
+	--child-window-shadow-blur: 10px;
+	--child-window-shadow-color: rgba(0,0,0,0.5);
+	--child-window-title-size: 30px;
+	--child-window-animation: 0.15s;
+	--main-taskbar-background: black;
+	--main-taskbar-height: 40px;
+	--main-taskbar-bottom-border-size: 1px;
+	--main-taskbar-border: white;
+	--main-taskbar-window: #e6e6e6;
+	--main-taskbar-window-active: #cccccc;
+	--main-taskbar-font-color: black;
+	--main-taskbar-font-color-active: black;
+	--main-taskbar-font-family: Arial;
+	--fan-1-speed:1s;
+	--fan-2-speed:1s;
+	--fan-dryer-speed:1s;
+	--valve_width:20%;
+	--port_height:50vh;
+	--land_height:100vh;
+	--gas-edge-gap-1:0.4vh;
+	--gas-edge-gap-2:85%;
+	--air-edge-gap-1:1.6vh;
+	--pipe-width-P:0.8vh;
+	--pipe-width-L:1.6vh;
+	--pipe-right-gap-1-P:1.5vh;
+	--pipe-right-gap-1-L:3vh;
+	--burner-group-height:7vh;
+	--BHL:calc(80vh * 0.75);
+	--BHP:calc(80vh * 0.375);
+}
+
+.GROUP_GAS_1{
+	background-color: yellow;
+	position: absolute;
+	left: calc(var(--pipe-width-P)/2);
+	right: calc(var(--pipe-width-P)/2);
+	width: calc(100% * 2);
+	height: var(--pipe-width-P);
+}
+
+.GROUP_GAS_2{
+	background-color: yellow;
+	position: absolute;
+	Top: 50%;
+	width: var(--pipe-width-P);
+	height: 100%;
+}
+
+.GROUP_GAS_3{
+	background-color: yellow;
+	position: absolute;
+	left: calc(var(--pipe-width-P)/2);
+	right: calc(var(--pipe-width-P)/2);
+	Top: 50%;
+	width: var(--pipe-width-P);
+	height: calc(var(--burner-group-height) * 3);
+}
+
+.GROUP_GAS_4{
+	background-color: yellow;
+	position: absolute;
+	left: calc(50% - calc(var(--pipe-width-P)/2));
+	right: calc(50% - calc(var(--pipe-width-P)/2));
+	width: calc(100% * 2);
+	height: var(--pipe-width-P);
+}
+
+.GROUP_GAS_5{
+	background-color: yellow;
+	position: absolute;
+	width: var(--pipe-width-P);
+	left: calc(var(--pipe-width-P)/2);
+	right: calc(var(--pipe-width-P)/2);
+	bottom: calc(var(--pipe-width-P)/2);
+	height: calc(20% + calc(var(--pipe-width-P) * 4));
+}
+
+.GROUP_GAS_6_BOTTOM{
+	background-color: yellow;
+	position: absolute;
+	left: calc(var(--pipe-width-P) / 2);
+	width: calc(100% - var(--pipe-width-P));
+	height: var(--pipe-width-P);
+	bottom: calc(var(--pipe-width-P) / 2);
+}
+
+.GROUP_AIR_1{
+	background-color: blue;
+	position: absolute;
+	left: calc(var(--pipe-width-P) * 2);
+	right: calc(var(--pipe-width-P) * 2);
+	Top: calc(50% - calc(var(--pipe-width-P)/2));
+	height: var(--pipe-width-P);
+	width: 200%;
+}
+
+.GROUP_AIR_1A{
+	background-color: blue;
+	position: absolute;
+	left: calc(var(--pipe-width-P) * 4);
+	right: calc(var(--pipe-width-P) * 4);
+	Top: calc(50% - calc(var(--pipe-width-P)/2));
+	height: var(--pipe-width-P);
+	width: 200%;
+}
+
+
+.GROUP_AIR_2{
+	background-color: blue;
+	position: absolute;
+	left: calc(var(--pipe-width-P) * 2);
+	right: calc(var(--pipe-width-P) * 2);
+	Top: calc(50% - calc(var(--pipe-width-P)/2));
+	height: var(--pipe-width-P);
+	width: 200%;
+}
+
+.GROUP_AIR_3{
+	background-color: blue;
+	position: absolute;
+	left: calc(var(--pipe-width-P) * 2);
+	right: calc(var(--pipe-width-P) * 2);
+	Top: calc(50% - calc(var(--pipe-width-P)/2));
+	width: var(--pipe-width-P);
+	height: 210%;
+}
+
+.GROUP_AIR_3B{
+	background-color: blue;
+	position: absolute;
+	left: calc(var(--pipe-width-P) * 4);
+	right: calc(var(--pipe-width-P) * 4);
+	Top: calc(50% - calc(var(--pipe-width-P)/2));
+	width: var(--pipe-width-P);
+	height: 380%;
+}
+
+.GROUP_AIR_4{
+	background-color: blue;
+	position: absolute;
+	left: calc(var(--pipe-width-P) * 2);
+	right: calc(var(--pipe-width-P) * 2);
+	width: var(--pipe-width-P);
+	height: calc(20% + calc(var(--pipe-width-P)/2));
+	bottom: calc(var(--pipe-width-P) * 2);
+}
+
+.GROUP_AIR_5_BOTTOM_LEFT{
+	background-color: blue;
+	position: absolute;
+	width: calc(70% - calc(var(--pipe-width-P) * 2) + 4px);
+	height: var(--pipe-width-P);
+	left: calc(var(--pipe-width-P) * 2);
+	bottom: calc(var(--pipe-width-P) * 2);
+}
+
+.GROUP_AIR_5_BOTTOM_RIGHT{
+	background-color: blue;
+	position: absolute;
+	width: calc(30% - calc(var(--pipe-width-P) * 2));
+	height: var(--pipe-width-P);
+	right: calc(var(--pipe-width-P) * 2);
+	bottom: calc(var(--pipe-width-P) * 2);
+}
+
+.LEFT_GAS_1{
+	background-color: yellow;
+	position: absolute;
+	left: calc(var(--pipe-width-P)/2);
+	width: var(--pipe-width-P);
+	height: calc(var(--burner-group-height)*2);
+	top: 0;
+}
+
+.SIDE_SPACER{
+	display: flex;
+	position: relative;
+	align-items: center;
+}
+
+.LEFT_AIR_1{
+	background-color: blue;
+	position: absolute;
+	left: calc(var(--pipe-width-P)*2);
+	width: var(--pipe-width-P);
+	height: calc(var(--burner-group-height)*3);
+	top: 0;
+}
+
+.RIGHT_GAS_1{
+	background-color: yellow;
+	position: absolute;
+	right: calc(var(--pipe-width-P)/2);
+	width: var(--pipe-width-P);
+	height: calc(var(--burner-group-height)*2);
+	top: 0;
+}
+
+.RIGHT_AIR_1{
+	background-color: blue;
+	position: absolute;
+	right: calc(var(--pipe-width-P)*2);
+	width: var(--pipe-width-P);
+	height: calc(var(--burner-group-height)*3);
+	top: 0;
+}
+
+#body {
+	position: relative;
+	font-family: 'Roboto Condensed', sans-serif;
+	margin: 0;
+	background: #eee;
+	height: auto;
+}
+
+#main {
+	position: relative;
+	display:block;
+	overflow: hidden;
+}
+
+#tab_row{
+	position: relative;
+	height: 3vh;
+	display: flex;
+}
+
+#tab_body{
+	position: relative;
+}
+
+.landing {
+	position: relative;
+	background: #fff;
+}
+
+.tabs{
+	max-width: 25%;
+	min-width: 5%;
+	display: flex;
+	height: 100%;
+	position: relative;
+	border-radius: 2vh 2vh 0 0;
+	box-sizing: border-box;
+	border-left: 1px solid #555;
+	border-top: 1px solid #555;
+	border-right: 1px solid #555;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+}
+
+.tab_selected{
+	background-color:black;
+	color:white;
+}
+
+.tab_selected:hover{
+	font-weight:bold;
+}
+
+.tab_notselected{
+	background-color:white;
+	color:black;
+}
+
+.tab_notselected:hover{
+	font-weight:bold;
+}
+
+.landing-HMI {
+	position: relative;
+	display: flex;
+	flex: 0 1 50vw;
+	/*height: var(--port_height);*/
+	flex-direction: column;
+}
+
+.landing-DRY {
+	position: relative;
+	display: flex;
+	flex: 0 1 50vw;
+	/*height: var(--port_height);*/
+	flex-direction: column;
+}
+
+.landing-PARAM {
+	position: relative;
+	display: flex;
+	flex: 0 1 50vw;
+	/*height: var(--port_height);*/
+	flex-direction: column;
+}
+
+.landing-TREND {
+	position: relative;
+	display: flex;
+	height: 100vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+.landing-TREND_FOREGROUND {
+	position: absolute;
+    display: flex;
+    height: 4%;
+    z-index: 100;
+    width: 100%;
+    top: 0;
+}
+
+.DRYER_SECTION_LEFT{
+    display: flex;
+    position: relative;
+    width: 50%;
+    height: 100%;
+	box-sizing: border-box;
+	padding: 2%;
+	flex-direction: column;
+}
+
+.DRYER_SECTION_RIGHT{
+	display: flex;
+    position: relative;
+    width: 50%;
+    height: 100%;
+	box-sizing: border-box;
+	padding: 2%;
+	flex-direction: column;
+}
+
+.DRYER_DOOR{
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 25%;
+    background-color: grey;
+	color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    margin: 1%;
+}
+
+.DRYER_SECTION_RIGHT_TOP{
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 20%;
+    justify-content: center;
+    align-items: center;
+}
+
+.DRYER_SECTION_RIGHT_MID{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 40%;
+	flex-direction: column;
+}
+
+.DRYER_SECTION_RIGHT_BOT{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 20%;
+	justify-content: center;
+    align-items: center;
+}
+
+.DRYER_CB{
+    padding: 0.25rem;
+    display: flex;
+    position: relative;
+    background-color: white;
+    color: red;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    border: 0.1rem solid #555;
+    height: fit-content;
+	width: 90%;
+}
+
+.DRYER_STATUS{
+	padding: 0.25rem;
+    display: flex;
+    position: relative;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    border: 0.1rem solid #555;
+    height: fit-content;
+	width: 90%;
+}
+
+.DRYER_MODE{
+	padding: 0.25rem;
+    display: flex;
+    position: relative;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    border: 0.1rem solid #555;
+    height: fit-content;
+	width: 90%;
+}
+
+.HMI_DRYER{
+	position: relative;
+	display: flex;
+	flex: 0 1 50vw;
+	height: var(--port_height);
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+.HMI_PARAM{
+	
+}
+
+.fan{
+	display: flex;
+	/* position: absolute; */
+	width:100%;
+	height:100%;
+	
+	color: blue;
+}
+
+.fan1{
+	animation: infiniteRotate var(--fan-1-speed) linear infinite;
+}
+
+.fan2{
+	animation: infiniteRotate var(--fan-2-speed) linear infinite;
+}
+
+.Dryerfan{
+	animation: infiniteRotate var(--fan-dryer-speed) linear infinite;
+}
+
+.fan svg path{
+	fill: currentColor;
+}
+
+.Ring1{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+.Ring2{
+	position: absolute;
+	width: 85%;
+	height: 85%;
+}
+
+.svgCircle{
+	position: absolute;
+	width: 25%;
+	height: 25%;	
+	}
+	
+.PURGE_BOX{
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	position: absolute;
+	width: calc(90% - calc(var(--pipe-width-P) * 5));
+	height: calc(85% - calc(var(--pipe-width-P) * 4));
+	background-color: yellow;
+	box-sizing: border-box;
+	border: 2px solid black;
+	flex-direction: column;
+	left: var(--pipe-width-P);
+	right: var(--pipe-width-P);
+	bottom: calc(calc(var(--pipe-width-P) * 5.5));
+}
+
+.PURGE_BOX_TITLE{
+	font-size: calc(0.9vh + 0.9vw);
+}
+
+.PURGE_SUB_BOX{
+	height:65%;
+	width:96%;
+	box-sizing: border-box;
+	border: 1px solid black;
+}
+
+.PURGE_LINE{
+	display: flex;
+	width: 100%;
+	height: 50%;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.PURGE_CIRCLE{
+	display: flex;
+	width: calc(var(--pipe-width-P) * 2);
+	height: calc(var(--pipe-width-P) * 2);
+	border-radius: var(--pipe-width-P);
+	background-color: white;
+	box-sizing: border-box;
+	border: 1px solid black;
+	margin: 0px 2px 0px 2px;
+}
+
+.PURGE_TEXT{
+	font-size: calc(0.9vh + 0.9vw);
+}
+
+.DRYER_FAN_BOX_TOP{
+	display: flex;
+	position: relative;
+	height: 75%;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.DRYER_FAN_BOX_BOT{
+	display: flex;
+	position: relative;
+	height: 25%;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.FAN_BOX{
+	display: flex;
+	position: absolute;
+	width: calc(100% - calc(var(--pipe-width-P) * 2));
+	height: calc(100% - calc(var(--pipe-width-P) * 8));
+	background-color: #e6e6e6;
+	box-sizing: border-box;
+	border: 2px solid black;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+	bottom: calc(calc(var(--pipe-width-P) * 3.5));
+}
+
+.FAN_BOX_MIDDLE{
+	display: flex;
+	position: relative;
+	width: 30%;
+	flex-direction: column;
+}
+
+.FAN_BOX_LEFT{
+	display: flex;
+	position: relative;
+	width: 30%;
+	flex-direction: column;
+}
+
+.FAN_BOX_LEFT_TOP{
+	display: flex;
+	position: relative;
+	width: 100%;
+	height: calc(100% / 3);
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.FAN_BOX_LEFT_MID{
+	display: flex;
+	position: relative;
+	width: 100%;
+	height: calc(100% / 3);
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.FAN_BOX_LEFT_BOT{
+	display: flex;
+	position: relative;
+	width: 100%;
+	height: calc(100% / 3);
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.FAN_BOX_RIGHT{
+	display: flex;
+	position: relative;
+	width: 30%;
+	height: 100%;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.FAN_BOX_RIGHT_FAULT{
+	display: flex;
+	position: absolute;
+	color: red;
+	font-size: calc(0.5vh + 0.5vw);
+}
+
+.FAN_BOX_RIGHT_TOP{
+	display: flex;
+	position: relative;
+	height: 50%;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.FAN_BOX_RIGHT_BOT{
+	display: flex;
+	position: relative;
+	height: 50%;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(1vh + 1vw);
+}
+
+.FAN_AIR_1{
+	background-color: blue;
+	position: absolute;
+	left: calc(100% - calc(var(--pipe-width-P) * 2));
+	height: var(--pipe-width-P);
+	top: 46%; /*calc(var(--pipe-width-P) * 3.5);*/
+	width: calc(var(--pipe-width-P) * 1.6);
+}
+
+.FAN_AIR_2{
+	background-color: darkblue;
+	position: absolute;
+	height: calc(42% - calc(var(--pipe-width-P) * 2 ));
+	top: 52%;
+	width: calc(var(--pipe-width-P) * 1);
+	left: calc(100% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 0.6));
+}
+
+.FAN_AIR_2B{
+	background-color: darkblue;
+	position: absolute;
+	height: calc(18% - calc(var(--pipe-width-P) * 2 ));
+	top: 87%;
+	width: calc(var(--pipe-width-P) * 1);
+	left: calc(100% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 0.6));
+}
+
+.FAN_AIR_2C{
+	background-color: blue;
+	position: absolute;
+	height: calc(54% - calc(var(--pipe-width-P) * 2 ));
+	top: 46%;
+	width: calc(var(--pipe-width-P) * 1);
+	left: calc(100% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 0.6));
+}
+
+.FAN_AIR_3{
+	background-color: blue;
+	position: absolute;
+	height: var(--pipe-width-P);
+	bottom: calc(var(--pipe-width-P) * 2);
+	width: calc(100% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 7.4));
+	left: calc(100% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 1.5));
+}
+
+.FAN_AIR_3B{
+	background-color: blue;
+	position: absolute;
+	height: var(--pipe-width-P);
+	bottom: calc(var(--pipe-width-P) * 2);
+	width: calc(100% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 45));
+	left: calc(-125% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 1.5));
+}
+
+.PRESS_BOX{
+	display: flex;
+	position: relative;
+	width: calc(1.2vh + 1.2vw);
+	height: calc(1.2vh + 1.2vw);
+	background-color: white;
+	box-sizing: border-box;
+	border: 1px solid black;
+	font-size: calc(0.9vh + 0.9vw);
+	justify-content: center;
+	align-items: center;
+}
+
+@-webkit-keyframes infiniteRotate {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg);}
+}
+
+.HMI_CONTROLS {
+	display: flex;
+	height: 10vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	background-color: blue;
+	position: relative;
+	flex-direction: column;
+}
+
+.DRY_CONTROLS {
+	display: flex;
+	height: 10vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	background-color: blue;
+	position: relative;
+	flex-direction: column;
+}
+
+.HMI_CONTROLS_MAX {
+	display: flex;
+	height: 100vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	background-color: blue;
+	position: relative;
+	flex-direction: column;
+}
+
+.HMI_GRAPHICS {
+	position: relative;
+	display: inline-flex;
+	height: 40vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	background-color: darkgray;
+	width: 100%;
+}
+
+.DRY_GRAPHICS {
+	position: relative;
+	display: inline-flex;
+	height: 40vh;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	background-color: darkgray;
+	width: 100%;
+}
+
+.HMI_CONT_DATA{
+	background-color: #9999ff;
+}
+
+.HMI_CONT_DIP{
+	background-color: #c6ecd8
+}
+
+.HMI_CONT_PV{
+	background-color: red; 
+	color: white;
+}
+
+.HMI_CONT_SP{
+	background-color: #33cc33;
+}
+
+.HMI_CONT_NPN{
+	background-color: #cccccc; 
+	width:calc(200% + 6px)!important;
+}
+
+.HMI_CONT_OUTPUT{
+	background-color: yellow;
+}
+
+.HMI_CONT_GASFLOW{
+	background-color: orange;
+}
+
+.DRY_CONT_DATA{
+	background-color: #9999ff;
+}
+
+.DRY_EX_TEMP{
+	background-color: hsl(180, 100%, 50%); 
+	color: black;
+}
+
+.DRY_DRYER_TEMP{
+	background-color: hsl(60, 100%, 40%);
+	color: black;
+}
+
+.DRY_FAN_SPEED{
+	background-color: hsl(0, 0%, 100%);
+	color: black;
+}
+
+.HMI_SIDE{
+	width: 30%;
+	height: 100%;
+}
+
+.HMI_MIDDLE{
+	width: 40%;
+	height: 100%;
+}
+
+.HMI_SECTION_MIDDLE_TOP_SYS{
+	display: flex;
+	position: absolute;
+	width: 80%;
+	height: 12.25%;
+	top: 2%;
+	background-color: #e6e6e6;
+	box-sizing: border-box;
+	border: 2px solid black;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(1.2vh + 1.2vw);
+}
+
+.HMI_TOP{
+	height: 65%;
+	width: 100%;
+}
+
+.HMI_TOP_BACK{
+	display: flex;
+	position: absolute;
+	border: 3px solid black;
+	background-color: darkcyan;
+	justify-content: center;
+	align-items: center;
+	height: calc(calc(calc(calc(var(--BHP)*.9)/8)*7) + calc(var(--BHP)*.05));
+	box-sizing: border-box;
+	width: 100%;
+}
+
+.HMI_TOP_FOREGROUND{
+	display: flex;
+	position: absolute;
+	border: 3px solid transparent;
+	background-color: transparent;
+	justify-content: center;
+	align-items: center;
+	height: calc(calc(calc(calc(var(--BHP)*.9)/8)*7) + calc(var(--BHP)*.05));
+	box-sizing: border-box;
+	width: 100%;
+	z-index: 500 !important;
+}
+
+.HMI_TOP_BACK_MIDDLE{
+	display: flex;
+	position: absolute;
+	width: calc(100% - 6px);
+	height: calc(100% - 6px);
+	background-color: black;
+	justify-content: center;
+	align-items: center;
+}
+
+.HMI_TOP_BACK_TEXT{
+	color: white;
+	font-size: calc(2vh + 2vw);
+}
+
+.HMI_TOP_LEFT{
+	width: 50%;
+	height: 100%;
+}
+
+.HMI_TOP_RIGHT{
+	width: 50%;
+	height: 100%;
+}
+
+.HMI_BOT{
+	height: 35%;
+	width: 100%;
+}
+
+.HMI_MIDDLE_BOT_LEFT{
+	display: flex;
+	position: relative;
+	width: 50%;
+	height: 90%;
+	justify-content: left;
+	align-items: center;
+}
+
+.HMI_MIDDLE_BOT_LEFT_TOP{
+	display: flex;
+	position: relative;
+	width: 50%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.HMI_MIDDLE_BOT_LEFT_BOT{
+	display: flex;
+	position: relative;
+	width: 50%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.HMI_MIDDLE_BOT_RIGHT{
+	display: flex;
+	position: relative;
+	width: 50%;
+	height: 90%;
+	justify-content: left;
+	align-items: center;
+}
+
+.HMI_MIDDLE_BOT_RIGHT_TOP{
+	display: flex;
+	position: relative;
+	width: 50%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.HMI_MIDDLE_BOT_RIGHT_BOT{
+	display: flex;
+	position: relative;
+	width: 50%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.HMI_SECTION{
+	display:flex;
+	box-sizing: border-box;
+	/* border: 1px solid #555; */
+	flex-direction: column;
+	position: relative;
+	justify-content: space-evenly;
+}
+
+.BACK_WRAPPER{
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+#HMI_LEFT{
+	position: absolute;
+	left: 0;
+}
+
+#HMI_RIGHT{
+	position: absolute;
+	right: 0;
+}
+
+.FLAME{
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+}
+
+.LO_FIRE:nth-child(1){
+	width: 30%;
+	height: 30%;
+	background-color: #ff6600;
+	box-shadow: 0px 0px 5px 2px #ff6600;
+}
+
+.LO_FIRE:nth-child(2){
+	width: 17%;
+	height: 17%;
+	background-color: orange;
+	box-shadow: 0px 0px 5px 2px orange;
+}
+
+.LO_FIRE:nth-child(3){
+	width: 10%;
+	height: 10%;
+	background-color: yellow;
+	box-shadow: 0px 0px 5px 2px yellow;
+}
+
+.LO_FIRE{
+	position: absolute;
+	display: flex;
+	border-radius: 50%;
+}
+
+.HI_FIRE:nth-child(1){
+	width: 100%;
+	height: 100%;
+	background-color: lightblue;
+	box-shadow: 0px 0px 5px 2px lightblue;
+}
+
+.HI_FIRE:nth-child(2){
+	width: 60%;
+	height: 60%;
+	background-color: blue;
+	box-shadow: 0px 0px 5px 2px blue;
+}
+
+.HI_FIRE:nth-child(3){
+	width: 25%;
+	height: 25%;
+	background-color: white;
+	box-shadow: 0px 0px 5px 2px white;
+}
+
+.HI_FIRE{
+	position: absolute;
+	display: flex;
+	border-radius: 50%;
+}
+
+.FLAME_FAULT{
+	color: red;
+	font-size: 2vh;
+	width: 100%;
+}
+
+.FIRE{
+	position: relative;
+	width: 100%;
+	height: 30%;
+	display: flex;
+	align-items: center;
+}
+
+.GROUP_C1{
+	display:flex;
+	width: 25%;
+	position: relative;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.GROUP_C2{
+	width: 25%;
+	height: 100%;
+	z-index: 1;
+	justify-content: center;
+	position: relative;
+	flex-direction: column;
+}
+
+.GROUP_SECTION{
+	display:flex;
+	position: relative;
+	width: 100%;
+	height: 50%;
+	justify-content: center;
+	align-items: center;
+}
+
+.GROUP_C3{
+	width: 25%;
+	height:100%;
+	flex-direction: column;
+	z-index:1;
+	justify-content: center;
+}
+
+.GROUP_C5{
+	width: 25%;
+	height: 100%;
+	flex-direction: column;
+	justify-content: right;
+}
+
+.GROUP_C{
+	display:flex;
+}
+
+.BURNER_GROUP{
+	display: flex;
+	width: 100%;
+	height: var(--burner-group-height);
+	position: relative;
+	justify-content: space-evenly;
+}
+
+.GROUP_C5_TOP{
+	display:flex;
+	width:100%;
+	height:50%;
+}
+
+.GROUP_C5_BOT{
+	display:flex;
+	width:100%;
+	height:calc(calc(var(--burner-group-height)*0.5) * 0.8);
+	z-index: 1;
+	position: relative;
+}
+
+.GROUP_LABEL{
+	display:flex;
+	width:100%;
+	height:100%;
+	box-sizing: border-box;
+	border: 1px solid #555;
+	box-shadow: inset 0px 0px 5px #999;
+	z-index: 2;
+	position: relative;
+	background-color: aliceblue;
+	cursor: default;
+	user-select: none;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.8vh;
+}
+
+.GROUP_SPACER{
+	height: 5%;
+}
+
+.HMI_ROW_TOP{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(calc(100% / 3)*2) - 2px);
+	position: relative;
+}
+
+.HMI_ROW_BOT{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(100% / 3) - 2px);
+	position: relative;
+}
+
+.HMI_ROW_TOP_MAX{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(calc(100% / 3)*2) - 7px);
+	position: relative;
+	flex-direction: column;
+}
+
+.HMI_ROW_BOT_MAX{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(100vh /3);
+	position: relative;
+	flex-direction: column;
+}
+
+.HMI_BLOCK{
+	display: inline-flex;
+	width: 50%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(1.2vw + 1.2vh);
+}
+
+.HMI_DATA{
+	display: inline-flex;
+	width: 50%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: calc(1.2vw + 1.2vh);
+	padding-right: 2%;
+}
+
+.HMI_BLOCK_MAX{
+	display: inline-flex;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(4vw + 4vh);
+}
+
+.HMI_DATA_MAX{
+	display: inline-flex;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: calc(4vw + 4vh);
+	padding-right: 2%;
+}
+
+.HMI_WRAPPER{
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.HMI_WRAPPER_MAX{
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.HMI_SECTION_WRAPPER{
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+}
+
+.HMI_SECTION_WRAPPER_MAX{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: calc(100vh / 3);
+}
+
+.DRY_ROW_TOP{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(calc(100% / 3)*2) - 2px);
+	position: relative;
+}
+
+.DRY_ROW_BOT{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(100% / 3) - 2px);
+	position: relative;
+}
+
+.DRY_ROW_TOP_MAX{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(calc(calc(100% / 3)*2) - 7px);
+	position: relative;
+	flex-direction: column;
+}
+
+.DRY_ROW_BOT_MAX{
+	display: flex;
+	width: calc(100% - 6px);
+	height: calc(100vh /3);
+	position: relative;
+	flex-direction: column;
+}
+
+.DRY_BLOCK{
+	display: inline-flex;
+	width: 50%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(1.2vw + 1.2vh);
+}
+
+.DRY_DATA{
+	display: inline-flex;
+	width: 50%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: calc(1.2vw + 1.2vh);
+	padding-right: 2%;
+}
+
+.DRY_BLOCK_MAX{
+	display: inline-flex;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: center;
+	align-items: center;
+	font-size: calc(4vw + 4vh);
+}
+
+.DRY_DATA_MAX{
+	display: inline-flex;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	box-shadow: inset 1px 1px 3px #999;
+	border: 1px solid #555;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: calc(4vw + 4vh);
+	padding-right: 2%;
+}
+
+.DRY_WRAPPER{
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.DRY_WRAPPER_MAX{
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.DRY_SECTION_WRAPPER{
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+}
+
+.DRY_SECTION_WRAPPER_MAX{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: calc(100vh / 3);
+}
+
+.VALVE{
+	display: flex;
+	width: calc(calc(var(--burner-group-height)*0.5)*0.8);
+	height: calc(var(--burner-group-height)*0.75);
+	box-sizing: border-box;
+	background-color: transparent;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+.VALVE_TOP{
+	display: flex;
+	width: 90%;
+	height: 30%;
+	box-sizing: border-box;
+	border: 1px solid black;
+	background-color:#cccccc;
+}
+
+.VALVE_BOTTOM{
+	display: flex;
+	width: 100%;
+	height: 70%;
+	justify-content: center;
+	align-items: center;
+}
+
+.VALVE_BALLANCE{
+	display: flex;
+	width: 90%;
+	height: 30%;
+	box-sizing: border-box;
+	border: 1px solid transparent;
+}
+
+.VALVE_SIDE{
+	display: flex;
+	width: 20%;
+	height: 75%;
+	box-sizing: border-box;
+	border: 1px solid black;
+	background-color:#cccccc;
+}
+
+.VALVE_MIDDLE{
+	display: flex;
+	width: 60%;
+	height: 100%;
+	flex-direction: column;
+}
+
+.VALVE_MIDDLE_TOP{
+	display: flex;
+	width: 100%;
+	height: 33%;
+	justify-content: center;
+	align-items: center;
+}
+
+.VALVE_MIDDLE_MIDDLE{
+	display: flex;
+	width: 100%;
+	height: 36%;
+	box-sizing: border-box;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	background-color:#cccccc;
+}
+
+.VALVE_MIDDLE_TOP_LEFT{
+	display: flex;
+	width: 50%;
+	height: 100%;
+	border-right: 0.5px solid black;
+}
+
+.VALVE_MIDDLE_TOP_RIGHT{
+	display: flex;
+	width: 50%;
+	height: 100%;
+	border-left: 0.5px solid black;
+}
+
+/* Detect Portrait v Landscape */
+@media (min-aspect-ratio: 1/1) {
+	
+.landing {
+	display: flex;
+	height: var(--land_height);
+  }
+
+.landing-HMI {
+	height: var(--land_height);
+	width:50vw;
+  }
+  
+.landing-DRY {
+	height: var(--land_height);
+	width:50vw;
+  }
+  
+.landing-PARAM {
+	height: var(--land_height);
+	width:50vw;
+  }
+
+.landing-TREND {
+	height: var(--land_height);
+	width:100vw;
+}
+  
+.landing-TREND_FOREGROUND {
+	height: 4%;
+	width:100vw;
+}
+  
+.DRYER_DOOR{
+	font-size:2vw;
+}
+  
+.DRYER_CB{
+	font-size:2vw;
+}
+
+.DRYER_STATUS{
+	font-size:2vw;
+}
+
+.DRYER_MODE{
+	font-size:2vw;
+}
+
+.DRYER_FAN_BOX_BOT{
+	font-size:2vw;
+}
+  
+ .myChart{
+	 width:50vw;
+	 height:100vh;
+ }
+  
+.VALVE{
+	width: calc(calc(var(--burner-group-height) * 0.75) * 0.8);
+	height: calc(var(--burner-group-height) * 1.125);
+}
+
+.AIR_SPACER{
+	height:var(--burner-group-height);
+}
+
+.GROUP_C5_TOP{
+	height:calc(100% - calc(var(--burner-group-height) * 0.8));
+}
+
+.GROUP_C5_BOT{
+	height:calc(var(--burner-group-height) * 0.8);
+}
+
+.GROUP_LABEL{
+	font-size: 3vh;
+}
+
+.HMI_TOP_BACK{
+	height: calc(calc(calc(calc(var(--BHL)*.9)/8)*7) + calc(var(--BHL)*.05));
+}
+
+.HMI_TOP_FOREGROUND{
+	height: calc(calc(calc(calc(var(--BHL)*.9)/8)*7) + calc(var(--BHL)*.05));
+}
+
+
+
+.DRY_TOP_BACK{
+	height: calc(calc(calc(calc(var(--BHL)*.9)/8)*7) + calc(var(--BHL)*.05));
+}
+
+.HMI_CONTROLS {
+	height: 20vh;
+}
+
+.DRY_CONTROLS {
+	height: 20vh;
+}
+
+.HMI_CONTROLS_MAX {
+	width: 100vw;
+	height: 100vh;
+}
+
+.DRY_CONTROLS_MAX {
+	width: 100vw;
+	height: 100vh;
+}
+
+.HMI_GRAPHICS {
+	height: 80vh;
+}
+
+.DRY_GRAPHICS {
+	height: 80vh;
+}
+
+.HMI_BLOCK_MAX{
+	font-size: calc(3vw + 3vh);
+}
+
+.HMI_DATA_MAX{
+	font-size: calc(3vw + 3vh);
+}
+
+.DRY_BLOCK_MAX{
+	font-size: calc(3vw + 3vh);
+}
+
+.DRY_DATA_MAX{
+	font-size: calc(3vw + 3vh);
+}
+
+.FLAME_FAULT{
+	font-size: 3vh;
+}
+
+.GROUP_GAS_1{
+	left: calc(var(--pipe-width-L)/2);
+	right: calc(var(--pipe-width-L)/2);
+	height: var(--pipe-width-L);
+}
+
+.GROUP_GAS_2{
+	width: var(--pipe-width-L);
+}
+
+.GROUP_GAS_3{
+	left: calc(var(--pipe-width-L)/2);
+	right: calc(var(--pipe-width-L)/2);
+	width: var(--pipe-width-L);
+}
+
+.GROUP_GAS_4{
+	left: calc(50% - calc(var(--pipe-width-L)/2));
+	right: calc(50% - calc(var(--pipe-width-L)/2));
+	height: var(--pipe-width-L);
+}
+
+.GROUP_GAS_5{
+	width: var(--pipe-width-L);
+	left: calc(var(--pipe-width-L)/2);
+	right: calc(var(--pipe-width-L)/2);
+	bottom: calc(var(--pipe-width-L)/2);
+	height: calc(20% + calc(var(--pipe-width-L) * 4));
+}
+
+.GROUP_GAS_6_BOTTOM{
+	left: calc(var(--pipe-width-L) / 2);
+	width: calc(100% - var(--pipe-width-L));
+	height: var(--pipe-width-L);
+	bottom: calc(var(--pipe-width-L) / 2);
+}
+
+.GROUP_AIR_1{
+	left: calc(var(--pipe-width-L) * 2);
+	right: calc(var(--pipe-width-L) * 2);
+	Top: calc(50% - calc(var(--pipe-width-L)/2));
+	height: var(--pipe-width-L);
+}
+
+.GROUP_AIR_1A{
+	left: calc(var(--pipe-width-L) * 4);
+	right: calc(var(--pipe-width-L) * 4);
+	Top: calc(50% - calc(var(--pipe-width-L)/2));
+	height: var(--pipe-width-L);
+}
+
+.GROUP_AIR_2{
+	left: calc(var(--pipe-width-L) * 2);
+	right: calc(var(--pipe-width-L) * 2);
+	Top: calc(50% - calc(var(--pipe-width-L)/2));
+	height: var(--pipe-width-L);
+}
+
+.GROUP_AIR_3{
+	left: calc(var(--pipe-width-L) * 2);
+	right: calc(var(--pipe-width-L) * 2);
+	Top: calc(50% - calc(var(--pipe-width-L)/2));
+	width: var(--pipe-width-L);
+}
+
+.GROUP_AIR_3B{
+	left: calc(var(--pipe-width-L) * 4);
+	right: calc(var(--pipe-width-L) * 4);
+	Top: calc(50% - calc(var(--pipe-width-L)/2));
+	width: var(--pipe-width-L);
+}
+
+.GROUP_AIR_4{
+	left: calc(var(--pipe-width-L) * 2);
+	right: calc(var(--pipe-width-L) * 2);
+	width: var(--pipe-width-L);
+	height: calc(20% + calc(var(--pipe-width-L)/2));
+	bottom: calc(var(--pipe-width-L) * 2);
+}
+
+.GROUP_AIR_5_BOTTOM_LEFT{
+	width: calc(70% - calc(var(--pipe-width-L) * 2) + 4px);
+	height: var(--pipe-width-L);
+	left: calc(var(--pipe-width-L) * 2);
+	bottom: calc(var(--pipe-width-L) * 2);
+}
+
+.GROUP_AIR_5_BOTTOM_RIGHT{
+	width: calc(30% - calc(var(--pipe-width-L) * 2));
+	height: var(--pipe-width-L);
+	right: calc(var(--pipe-width-L) * 2);
+	bottom: calc(var(--pipe-width-L) * 2);
+}
+
+.LEFT_GAS_1{
+	left: calc(var(--pipe-width-L)/2);
+	width: var(--pipe-width-L);
+}
+
+.LEFT_AIR_1{
+	left: calc(var(--pipe-width-L)*2);
+	width: var(--pipe-width-L);
+}
+
+.RIGHT_GAS_1{
+	right: calc(var(--pipe-width-L)/2);
+	width: var(--pipe-width-L);
+}
+
+.RIGHT_AIR_1{
+	right: calc(var(--pipe-width-L)*2);
+	width: var(--pipe-width-L);
+}
+
+.PURGE_BOX{
+	width: calc(90% - calc(var(--pipe-width-L) * 5));
+	height: calc(85% - calc(var(--pipe-width-L) * 4));
+	left: var(--pipe-width-L);
+	right: var(--pipe-width-L);
+	bottom: calc(calc(var(--pipe-width-L) * 5.5));
+}
+
+.PURGE_SUB_BOX{
+	height:70%;
+}
+
+.PURGE_CIRCLE{
+	width: calc(var(--pipe-width-L) * 2);
+	height: calc(var(--pipe-width-L) * 2);
+	border-radius: var(--pipe-width-L);
+	margin: 0px 2px 0px 2px;
+}
+
+.PURGE_TEXT{
+	font-size: calc(0.9vh + 0.9vw);
+}
+
+.FAN_BOX{
+	width: calc(100% - calc(var(--pipe-width-L) * 2));
+	height: calc(100% - calc(var(--pipe-width-L) * 8));
+	bottom: calc(calc(var(--pipe-width-L) * 3.5));
+}
+
+.FAN_BOX_RIGHT_FAULT{
+	font-size: calc(0.5vh + 0.5vw);
+}
+
+.FAN_AIR_1{
+	left: calc(100% - calc(var(--pipe-width-L) * 2));
+	height: var(--pipe-width-L);
+	width: calc(var(--pipe-width-L) * 1.6);
+}
+
+.FAN_AIR_2{
+	height: calc(42% - calc(var(--pipe-width-L) * 2 ));
+	width: calc(var(--pipe-width-L) * 1);
+	left: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 0.6));
+}
+
+.FAN_AIR_2B{
+	height: calc(18% - calc(var(--pipe-width-L) * 2 ));
+	width: calc(var(--pipe-width-L) * 1);
+	left: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 0.6));
+}
+
+.FAN_AIR_2C{
+	height: calc(54% - calc(var(--pipe-width-L) * 2 ));
+	width: calc(var(--pipe-width-L) * 1);
+	left: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 0.6));
+}
+
+.FAN_AIR_3{
+	height: var(--pipe-width-L);
+	bottom: calc(var(--pipe-width-L) * 2);
+	width: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 5.4));
+	left: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 1.5));
+}
+
+.FAN_AIR_3B{
+	height: var(--pipe-width-L);
+	bottom: calc(var(--pipe-width-L) * 2);
+	width: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 35));
+	left: calc(-117% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 1.5));
+}
+
+#tab_row{    
+	height: 6vh;
+}
+
+}
+
+
+
