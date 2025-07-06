@@ -1,3 +1,4 @@
+const Code_Ver = 4.1.4;
 const ModbusData = [];
 const CustomerData = [];
 var SampleCount = 3;
