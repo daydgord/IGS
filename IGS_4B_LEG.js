@@ -1,4 +1,4 @@
-const Code_Ver = 4.1.4;
+const Code_Ver = "4.1.3";
 const ModbusData = [];
 const CustomerData = [];
 var SampleCount = 3;
