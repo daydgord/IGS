@@ -890,7 +890,8 @@
 }
 
 .HMI_TOP_BACK_TEXT{
-	color: white;
+	/*color: white;*/
+	color: black;
 	font-size: calc(2vh + 2vw);
 }
 
