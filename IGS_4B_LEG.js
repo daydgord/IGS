@@ -1,140 +1,272 @@
-const Code_Ver = "4.1.3";
+const Code_Ver = "5.1.1";
 const ModbusData = [];
 const CustomerData = [];
 var SampleCount = 3;
 var pulseFlag = false;
 var LoopUp = true;
 var toggle = false;
-var thisCustomer = 'Xpress';
-var thisFurnaceID = 'Xpress';
+var thisCustomer = '';
+var thisFurnaceID = '';
+var thisFurnaceIDArray = ['',''];
 var thisBurnerCount = 4;
 var thisDryer = true;
 var thisEnclosure = false;
 var thisDipCount = false;
-var thisLogHistory = false;
 var thisFlowRate = false;
-var thisRefreshRate = 2000;
+var thisRefreshRate = 500;
+var refreshCount = 1;
 var visible = true;
 var centerTop = 14;
 var TopMaximised = false;
 var HMITrendMaximised = false;
 var USESIM = false;
+var SIMDATASET = false;
 var myChart;
 var LogSuccess = false;
-var chartCacheCount = 360;
-var chartCacheCleared = 1;
+var dryerDoorFlash = false;
+var convAnim = 1;
+var jigAnim = 1;
+var jigPos = [];
+var dryerSimSEQ = 0;
+var ConveyorSimSEQ = 0;
+var MasterID = 0;
+//var TEXTARRAY = [];
 
-const chartData1 = [];
-const chartData2 = [];
-const chartData3 = [];
+let TEXTARRAY = [
+    ["Zinc Temp","อุณหภูมิสังกะสี"],
+    ["Flue Temp","อุณหภูมิปล่องควัน"],
+    ["Setpoint","จุดกำหนด"],
+    ["Output","เอาท์พุต"],
+	["Gas Flow","การไหลของก๊าซ"],
+	["System OFF","ปิดระบบ"],
+	["Sysem ON","ระบบเปิดอยู่"],
+	["Zone","โซน"],
+	["Fan","พัดลม"],
+	["Purging","การกวาดล้าง"],
+	["Complete","สมบูรณ์"],
+	["Fault","แย่"],
+	["Ex IN","หลบหนีเข้า"],
+	["Ex OUT","หลบหนีออก"],
+	["Dryer IN","เครื่องอบผ้าเข้า"],
+	["Dryer OUT","เครื่องอบผ้าออก"],
+	["Fan Speed","ความเร็วพัดลม"],
+	["Circuit Breaker","เบรกเกอร์"],
+	["AUTO","อัตโนมัติ"],
+	["MANUAL","คู่มือ"],
+	["ON","บน"],
+	["OFF","ปิด"],
+	["Flame",'เปลวไฟ']
+];
+
+var LANSEL = 0;  //0 = english, 1 = Thai
 
 function GetArduinoInputs(){
 	try{
-		console.log('Trying XML DATA Request');
-		nocache = "&nocache=" + Math.random() * 1000000;
-		var request = new XMLHttpRequest();
-		request.onreadystatechange = function()
-		{
-			if (this.readyState == 4) {
-				if (this.status == 200) {
-					if (this.responseXML != null) {
-						// extract XML data from XML file (containing switch states and analog value)
-						ModbusData[0].ZINC_TEMP_PV = this.responseXML.getElementsByTagName('zincTemp')[0].childNodes[0].nodeValue;
-						ModbusData[0].FLUE_TEMP_PV = this.responseXML.getElementsByTagName('flueTemp')[0].childNodes[0].nodeValue;
-						ModbusData[0].BURNER_1_INT = this.responseXML.getElementsByTagName('burner1')[0].childNodes[0].nodeValue;
-						ModbusData[0].BURNER_2_INT = this.responseXML.getElementsByTagName('burner2')[0].childNodes[0].nodeValue;
-						ModbusData[0].BURNER_3_INT = this.responseXML.getElementsByTagName('burner3')[0].childNodes[0].nodeValue;
-						ModbusData[0].BURNER_4_INT = this.responseXML.getElementsByTagName('burner4')[0].childNodes[0].nodeValue;
-						ModbusData[0].ZONE_A_INT = this.responseXML.getElementsByTagName('zoneA')[0].childNodes[0].nodeValue;
-						ModbusData[0].ZONE_B_INT = this.responseXML.getElementsByTagName('zoneB')[0].childNodes[0].nodeValue;
-						ModbusData[0].SYS_INT = this.responseXML.getElementsByTagName('system')[0].childNodes[0].nodeValue;
-						ModbusData[0].PID_SEL_OP = this.responseXML.getElementsByTagName('output')[0].childNodes[0].nodeValue;
-						ModbusData[0].ZINC_PID_SP = this.responseXML.getElementsByTagName('zincSP')[0].childNodes[0].nodeValue;
-						ModbusData[0].FLUE_PID_SP = this.responseXML.getElementsByTagName('flueSP')[0].childNodes[0].nodeValue;
-						ModbusData[0].GAS_FLOW_PV = this.responseXML.getElementsByTagName('gasflow')[0].childNodes[0].nodeValue;
-						ModbusData[0].FAN_1_SPEED = this.responseXML.getElementsByTagName('fanAspeed')[0].childNodes[0].nodeValue;
-						ModbusData[0].FAN_2_SPEED = this.responseXML.getElementsByTagName('fanBspeed')[0].childNodes[0].nodeValue;
-						
-						ModbusData[0].EX_IN = this.responseXML.getElementsByTagName('exin')[0].childNodes[0].nodeValue;
-						ModbusData[0].EX_OUT = this.responseXML.getElementsByTagName('exout')[0].childNodes[0].nodeValue;
-						ModbusData[0].DRY_IN = this.responseXML.getElementsByTagName('dryin')[0].childNodes[0].nodeValue;
-						ModbusData[0].DRY_OUT = this.responseXML.getElementsByTagName('dryout')[0].childNodes[0].nodeValue;
-						ModbusData[0].DRY_SPEED = this.responseXML.getElementsByTagName('drySpeed')[0].childNodes[0].nodeValue;
-						ModbusData[0].DRY_SP = this.responseXML.getElementsByTagName('drySP')[0].childNodes[0].nodeValue;
-						ModbusData[0].DRY_INT = this.responseXML.getElementsByTagName('dryDig')[0].childNodes[0].nodeValue;
-						
-						ModbusData[0].DMD_OUT = this.responseXML.getElementsByTagName('dmdOut')[0].childNodes[0].nodeValue;
-						ModbusData[0].DMD_TIME = this.responseXML.getElementsByTagName('dmdTime')[0].childNodes[0].nodeValue;
-						ModbusData[0].KB_TEMP = this.responseXML.getElementsByTagName('KBTemp')[0].childNodes[0].nodeValue;
-						ModbusData[0].CREEP_TEMP = this.responseXML.getElementsByTagName('creepTemp')[0].childNodes[0].nodeValue;
-						ModbusData[0].KB_VAL = this.responseXML.getElementsByTagName('KBval')[0].childNodes[0].nodeValue;
-						ModbusData[0].KB_HYST = this.responseXML.getElementsByTagName('KBHyst')[0].childNodes[0].nodeValue;
-						ModbusData[0].MAX_DMD = this.responseXML.getElementsByTagName('MaxDmd')[0].childNodes[0].nodeValue;
-						ModbusData[0].FAN_SPEED = this.responseXML.getElementsByTagName('FanSPD')[0].childNodes[0].nodeValue;
-						ModbusData[0].LOW_TEMP = this.responseXML.getElementsByTagName('lowTemp')[0].childNodes[0].nodeValue;
-						ModbusData[0].ZINC_CAL = this.responseXML.getElementsByTagName('Cal')[0].childNodes[0].nodeValue;
-						ModbusData[0].FLUE_CTRL_ACT_TEMP = this.responseXML.getElementsByTagName('FCActTemp')[0].childNodes[0].nodeValue;
-						ModbusData[0].FLUE_CTRL_DACT_TEMP = this.responseXML.getElementsByTagName('FCDActTemp')[0].childNodes[0].nodeValue;
-						ModbusData[0].HT_CUTOUT = this.responseXML.getElementsByTagName('HTCutout')[0].childNodes[0].nodeValue;
-						ModbusData[0].HT_HYST = this.responseXML.getElementsByTagName('HTHyst')[0].childNodes[0].nodeValue;
-						ModbusData[0].PULSE_CYC_TIME = this.responseXML.getElementsByTagName('PCycTime')[0].childNodes[0].nodeValue;
-						
-						ModbusData[0].CON_INT = this.responseXML.getElementsByTagName('CONDig')[0].childNodes[0].nodeValue;
+		if(refreshCount==1){
+			console.log('Trying XML DATA Request');
+			nocache = "&nocache=" + Math.random() * 1000000;
+			var request = new XMLHttpRequest();
+			request.onreadystatechange = function()
+			{
+				if (this.readyState == 4) {
+					if (this.status == 200) {
+						if (this.responseXML != null) {
+							// extract XML data from XML file (containing switch states and analog value)
+							ModbusData[0].ZINC_TEMP_PV = this.responseXML.getElementsByTagName('zincTemp')[0].childNodes[0].nodeValue;
+							ModbusData[0].FLUE_TEMP_PV = this.responseXML.getElementsByTagName('flueTemp')[0].childNodes[0].nodeValue;
+							ModbusData[0].BURNER_1_INT = this.responseXML.getElementsByTagName('burner1')[0].childNodes[0].nodeValue;
+							ModbusData[0].BURNER_2_INT = this.responseXML.getElementsByTagName('burner2')[0].childNodes[0].nodeValue;
+							ModbusData[0].BURNER_3_INT = this.responseXML.getElementsByTagName('burner3')[0].childNodes[0].nodeValue;
+							ModbusData[0].BURNER_4_INT = this.responseXML.getElementsByTagName('burner4')[0].childNodes[0].nodeValue;
+							ModbusData[0].ZONE_A_INT = this.responseXML.getElementsByTagName('zoneA')[0].childNodes[0].nodeValue;
+							ModbusData[0].ZONE_B_INT = this.responseXML.getElementsByTagName('zoneB')[0].childNodes[0].nodeValue;
+							ModbusData[0].SYS_INT = this.responseXML.getElementsByTagName('system')[0].childNodes[0].nodeValue;
+							ModbusData[0].PID_SEL_OP = this.responseXML.getElementsByTagName('output')[0].childNodes[0].nodeValue;
+							ModbusData[0].ZINC_PID_SP = this.responseXML.getElementsByTagName('zincSP')[0].childNodes[0].nodeValue;
+							ModbusData[0].FLUE_PID_SP = this.responseXML.getElementsByTagName('flueSP')[0].childNodes[0].nodeValue;
+							ModbusData[0].GAS_FLOW_PV = this.responseXML.getElementsByTagName('gasflow')[0].childNodes[0].nodeValue;
+							ModbusData[0].FAN_1_SPEED = this.responseXML.getElementsByTagName('fanAspeed')[0].childNodes[0].nodeValue;
+							ModbusData[0].FAN_2_SPEED = this.responseXML.getElementsByTagName('fanBspeed')[0].childNodes[0].nodeValue;
+							ModbusData[0].EX_IN = this.responseXML.getElementsByTagName('exin')[0].childNodes[0].nodeValue;
+							ModbusData[0].EX_OUT = this.responseXML.getElementsByTagName('exout')[0].childNodes[0].nodeValue;
+							ModbusData[0].DRY_IN = this.responseXML.getElementsByTagName('dryin')[0].childNodes[0].nodeValue;
+							ModbusData[0].DRY_OUT = this.responseXML.getElementsByTagName('dryout')[0].childNodes[0].nodeValue;
+							ModbusData[0].DRY_SPEED = this.responseXML.getElementsByTagName('drySpeed')[0].childNodes[0].nodeValue;
+							ModbusData[0].DRY_SP = this.responseXML.getElementsByTagName('drySP')[0].childNodes[0].nodeValue;
+							ModbusData[0].DRY_INT = this.responseXML.getElementsByTagName('dryDig')[0].childNodes[0].nodeValue;
+							ModbusData[0].DMD_OUT = this.responseXML.getElementsByTagName('dmdOut')[0].childNodes[0].nodeValue;
+							ModbusData[0].DMD_TIME = this.responseXML.getElementsByTagName('dmdTime')[0].childNodes[0].nodeValue;
+							ModbusData[0].KB_TEMP = this.responseXML.getElementsByTagName('KBTemp')[0].childNodes[0].nodeValue;
+							ModbusData[0].CREEP_TEMP = this.responseXML.getElementsByTagName('creepTemp')[0].childNodes[0].nodeValue;
+							ModbusData[0].KB_VAL = this.responseXML.getElementsByTagName('KBval')[0].childNodes[0].nodeValue;
+							ModbusData[0].KB_HYST = this.responseXML.getElementsByTagName('KBHyst')[0].childNodes[0].nodeValue;
+							ModbusData[0].MAX_DMD = this.responseXML.getElementsByTagName('MaxDmd')[0].childNodes[0].nodeValue;
+							ModbusData[0].FAN_SPEED = this.responseXML.getElementsByTagName('FanSPD')[0].childNodes[0].nodeValue;
+							ModbusData[0].LOW_TEMP = this.responseXML.getElementsByTagName('lowTemp')[0].childNodes[0].nodeValue;
+							ModbusData[0].ZINC_CAL = this.responseXML.getElementsByTagName('Cal')[0].childNodes[0].nodeValue;
+							ModbusData[0].FLUE_CTRL_ACT_TEMP = this.responseXML.getElementsByTagName('FCActTemp')[0].childNodes[0].nodeValue;
+							ModbusData[0].FLUE_CTRL_DACT_TEMP = this.responseXML.getElementsByTagName('FCDActTemp')[0].childNodes[0].nodeValue;
+							ModbusData[0].HT_CUTOUT = this.responseXML.getElementsByTagName('HTCutout')[0].childNodes[0].nodeValue;
+							ModbusData[0].HT_HYST = this.responseXML.getElementsByTagName('HTHyst')[0].childNodes[0].nodeValue;
+							ModbusData[0].PULSE_CYC_TIME = this.responseXML.getElementsByTagName('PCycTime')[0].childNodes[0].nodeValue;
+							ModbusData[0].CON_INT = this.responseXML.getElementsByTagName('CONDig')[0].childNodes[0].nodeValue;
+						}
 					}
 				}
 			}
+			request.open("GET", "ajax_inputs" + nocache, true);
+			request.send(null);
+			updateHMI(MasterID);
+			refreshCount++;
+			if(refreshCount==5){refreshCount=1;};
+			updateHMIFAST(MasterID);
+		} else {
+			refreshCount++;
+			if(refreshCount==5){refreshCount=1;};
+			updateHMIFAST(MasterID);
 		}
-		request.open("GET", "ajax_inputs" + nocache, true);
-		request.send(null);
-		updateHMI(0);
+		
 		setTimeout('GetArduinoInputs()', thisRefreshRate);
 	} catch(err){
 		setTimeout('GetArduinoInputs()', thisRefreshRate);
 	}
 }
 
-function GetArduinoLogdata(){
+function GetSIMdata(){
 	try{
-		console.log('Trying XML LOG Request');
-		nocache = "&nocache=" + Math.random() * 1000000;
-		var request = new XMLHttpRequest();
-		request.onreadystatechange = function()
-		{
-			if (this.readyState == 4) {
-				if (this.status == 200) {
-					if (this.responseXML != null) {
-						var prevx = new Date(); 
-						for (let i = chartCacheCount; i >-1; i--) {
-							var thisDT = new Date();
-							thisDT.setFullYear(prevx.getFullYear());
-							thisDT.setMonth(prevx.getMonth());
-							thisDT.setDate(prevx.getDate());
-							thisDT.setHours(prevx.getHours());
-							thisDT.setMinutes(prevx.getMinutes());
-							thisDT.setSeconds(prevx.getSeconds());
-							thisDT.setTime(prevx.getTime() - (10000*i));
-							chartData1.push({x: thisDT,y: parseInt(this.responseXML.children[0].children[chartCacheCount - i].children[0].childNodes[0].data,10)/10});
-							chartData3.push({x: thisDT,y: parseInt(this.responseXML.children[0].children[chartCacheCount - i].children[1].childNodes[0].data,10)/10});
-							chartData2.push({x: thisDT,y: parseInt(this.responseXML.children[0].children[chartCacheCount - i].children[2].childNodes[0].data,10)/10});
-						}
-						console.log(this.responseXML);
-						LogSuccess = true;
-						GetArduinoInputs();
-					}
-				}
-			}
+		console.log('Using SIM Data!');
+		if (!SIMDATASET) {
+			ModbusData[0].ZINC_TEMP_PV = 420;
+			ModbusData[0].FLUE_TEMP_PV = 600;
+			ModbusData[0].BURNER_1_INT = 1;
+			ModbusData[0].BURNER_2_INT = 2;
+			ModbusData[0].BURNER_3_INT = 4;
+			ModbusData[0].BURNER_4_INT = 8;
+			ModbusData[0].ZONE_A_INT = 16;
+			ModbusData[0].ZONE_B_INT = 32;
+			ModbusData[0].SYS_INT = 64;
+			ModbusData[0].PID_SEL_OP = 50;
+			ModbusData[0].ZINC_PID_SP = 420;
+			ModbusData[0].FLUE_PID_SP = 500;
+			ModbusData[0].GAS_FLOW_PV = 0;
+			ModbusData[0].FAN_1_SPEED = 60;
+			ModbusData[0].FAN_2_SPEED = 60;
+			ModbusData[0].EX_IN = 600;
+			ModbusData[0].EX_OUT = 400;
+			ModbusData[0].DRY_IN = 120;
+			ModbusData[0].DRY_OUT = 80;
+			ModbusData[0].DRY_SPEED = 80;
+			ModbusData[0].DRY_SP = 80;
+			ModbusData[0].DMD_OUT = 3;
+			ModbusData[0].DMD_TIME = 60;
+			ModbusData[0].KB_TEMP = 5;
+			ModbusData[0].CREEP_TEMP = 6;
+			ModbusData[0].KB_VAL = 60;
+			ModbusData[0].KB_HYST = 4;
+			ModbusData[0].MAX_DMD = 40;
+			ModbusData[0].FAN_SPEED = 75;
+			ModbusData[0].LOW_TEMP = 8;
+			ModbusData[0].ZINC_CAL = 1;
+			ModbusData[0].FLUE_CTRL_ACT_TEMP = 800;
+			ModbusData[0].FLUE_CTRL_DACT_TEMP = 2;
+			ModbusData[0].HT_CUTOUT = 8;
+			ModbusData[0].HT_HYST = 4;
+			ModbusData[0].PULSE_CYC_TIME = 100;
+			ModbusData[0].CON_INT = SIMCONVEYORDIG();
+			ModbusData[0].DRY_INT = SIMDRYERDIG();
+			ModbusData[0].BURNER_1_INT = SIMBRNDIG(ModbusData[0].BURNER_1_INT);
+			ModbusData[0].BURNER_2_INT = SIMBRNDIG(ModbusData[0].BURNER_2_INT);
+			ModbusData[0].BURNER_3_INT = SIMBRNDIG(ModbusData[0].BURNER_3_INT);
+			ModbusData[0].BURNER_4_INT = SIMBRNDIG(ModbusData[0].BURNER_4_INT);
+			
+		} else {
+			ModbusData[0].CON_INT = SIMCONVEYORDIG();
+			ModbusData[0].DRY_INT = SIMDRYERDIG();
+			ModbusData[0].BURNER_1_INT = SIMBRNDIG(ModbusData[0].BURNER_1_INT);
+			ModbusData[0].BURNER_2_INT = SIMBRNDIG(ModbusData[0].BURNER_2_INT);
+			ModbusData[0].BURNER_3_INT = SIMBRNDIG(ModbusData[0].BURNER_3_INT);
+			ModbusData[0].BURNER_4_INT = SIMBRNDIG(ModbusData[0].BURNER_4_INT);
 		}
-		request.open("GET", "ajax_logdata" + nocache, true);
-		request.send(null);
-		defineChart();
-		if(!LogSuccess){setTimeout('GetArduinoInputs()', 2000);};
+		SIMDATASET = true;
+		if(refreshCount<2){updateHMI(MasterID);ConveyorSimSEQ++;dryerSimSEQ++;};
+		refreshCount++;
+		if(refreshCount>4){refreshCount=1;};
+		updateHMIFAST(MasterID);
+		setTimeout('GetSIMdata()', thisRefreshRate);
 	} catch(err){
-		if(!LogSuccess){setTimeout('GetArduinoLogdata()', 2000);};
+		updateHMIFAST(MasterID);
+		setTimeout('GetSIMdata()', thisRefreshRate);
 	}
 }
+
+function cycleLangugage(){
+	LANSEL++;
+	if(LANSEL>1){LANSEL=0;};
+	UpdateText(MasterID);
+	//document.cookie = "LANSELVAL=" + LANSEL + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+	setCookie("LANSELVAL", LANSEL, 365);
+}
+
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function UpdateText(ID){
+	var thisPREFIX = CustomerData[MasterID].Customer + "_" + CustomerData[MasterID].FurnaceID;
+	updateHMI(ID);
+	document.getElementById(thisPREFIX + '_HMI_CONTROLS_ZINCTEMP_LABEL').innerText = TEXTARRAY[0][LANSEL];//"Zinc Temp";
+	document.getElementById(thisPREFIX + '_HMI_CONTROLS_FLUETEMP_LABEL').innerText = TEXTARRAY[1][LANSEL];//"Flue Temp";
+	document.getElementById(thisPREFIX + '_HMI_CONTROLS_ZINCSP_LABEL').innerText =   TEXTARRAY[2][LANSEL];//"Setpoint";
+	document.getElementById(thisPREFIX + '_HMI_CONTROLS_FLUESP_LABEL').innerText =   TEXTARRAY[2][LANSEL];//"Setpoint";
+	document.getElementById(thisPREFIX + '_HMI_CONTROLS_OUTPUT_LABEL').innerText =   TEXTARRAY[3][LANSEL];//"Output";
+	if(thisFlowRate){document.getElementById(thisPREFIX + '_HMI_CONTROLS_GASFLOW_LABEL').innerText = TEXTARRAY[4][LANSEL];};//Gas Flow;
+	document.getElementById(thisPREFIX + '_DRY_CONTROLS_EXCHGINTEMP_LABEL').innerText = 	TEXTARRAY[12][LANSEL];//"Ex In";
+	document.getElementById(thisPREFIX + '_DRY_CONTROLS_DRYERINTEMP_LABEL').innerText = 	TEXTARRAY[14][LANSEL];//"Dryer In";
+	document.getElementById(thisPREFIX + '_DRY_CONTROLS_EXCHGSP_LABEL').innerText = 		TEXTARRAY[13][LANSEL];//"Ex Out";
+	document.getElementById(thisPREFIX + '_DRY_CONTROLS_DRYERSP_LABEL').innerText = 		TEXTARRAY[15][LANSEL];//"Dryer Out";
+	document.getElementById(thisPREFIX + '_DRY_CONTROLS_FANSPEED_LABEL').innerText = 	TEXTARRAY[16][LANSEL];//"Fan Speed";
+	document.getElementById(thisPREFIX + '_DRY_CONTROLS_FANSP_LABEL').innerText = 		TEXTARRAY[2][LANSEL];//"Setpoint";
+	document.getElementById(thisPREFIX + '_PURGE_1_BOX_TITLE').innerText = TEXTARRAY[7][LANSEL] + ' A ' + TEXTARRAY[8][LANSEL];;
+	document.getElementById(thisPREFIX + '_PURGE_1_TEXT_1').innerText = TEXTARRAY[9][LANSEL];//'Purging';
+	document.getElementById(thisPREFIX + '_PURGE_1_TEXT_2').innerText = TEXTARRAY[10][LANSEL];//'Complete';
+	document.getElementById(thisPREFIX + '_PURGE_2_BOX_TITLE').innerText = TEXTARRAY[7][LANSEL] + ' B ' + TEXTARRAY[8][LANSEL];;
+	document.getElementById(thisPREFIX + '_PURGE_2_TEXT_1').innerText = TEXTARRAY[9][LANSEL];//'Purging';
+	document.getElementById(thisPREFIX + '_PURGE_2_TEXT_2').innerText = TEXTARRAY[10][LANSEL];//'Complete';
+	document.getElementById(thisPREFIX + '_FAN_1_BOX_RIGHT_FAULT').innerText = TEXTARRAY[11][LANSEL];//'Fault'
+	document.getElementById(thisPREFIX + '_FAN_2_BOX_RIGHT_FAULT').innerText = TEXTARRAY[11][LANSEL];//'Fault'
+	document.getElementById(thisPREFIX + '_HMI_SECTION_MIDDLE_TOP_BACK_TEXT').innerHTML = thisFurnaceIDArray[LANSEL];
+	
+	var FlameFaultElements = document.getElementsByClassName('FLAME_FAULT');
+	for(var i=0;i<FlameFaultElements.length;i++){
+		FlameFaultElements[i].innerText = TEXTARRAY[22][LANSEL] + ' ' + TEXTARRAY[11][LANSEL];//'Fault'
+	}
+};
 
 function Main(){
-	CustomerData.push({Customer: thisCustomer, FurnaceID: thisFurnaceID, IncludeDips: false, BurnerCount: thisBurnerCount});
+	LANSEL = getCookie("LANSELVAL");
+	if(thisFurnaceID!=''){thisFurnaceIDArray[0]=thisFurnaceID;thisFurnaceIDArray[1]=thisFurnaceID;};
+	if(thisFurnaceIDArray[0]=="DR"){thisFurnaceIDArray[0]="XPress";};
+	if(thisFurnaceIDArray[1]=="DR"){thisFurnaceIDArray[1]="XPress";};
+	CustomerData.push({Customer: thisCustomer, FurnaceID: thisFurnaceIDArray[LANSEL], IncludeDips: false, BurnerCount: thisBurnerCount});
 	for(var i=0;i<CustomerData.length;i++){
 		if(CustomerData[i].BurnerCount == 12){centerTop = 10.75;};
 		createLayout(CustomerData[i].Customer + "_" + CustomerData[i].FurnaceID,'tab_body',CustomerData[i].IncludeDips,CustomerData[i].BurnerCount,visible);
@@ -146,127 +278,13 @@ function Main(){
 		document.documentElement.style.setProperty('--port_height', '48.5vh');
 		document.documentElement.style.setProperty('--land_height', '94vh');
 	};
-	if(thisLogHistory){
-		//GetArduinoLogdata();
+
+	if(USESIM) {
+		GetSIMdata();
 	} else {
-		//defineChartData();
 		GetArduinoInputs();
 	};
-}
-
-function defineChartData(){
-	var prevx = new Date(); 
-	for (let i = chartCacheCount; i >-1; i--) {
-		var thisDT = new Date();
-		thisDT.setFullYear(prevx.getFullYear());
-		thisDT.setMonth(prevx.getMonth());
-		thisDT.setDate(prevx.getDate());
-		thisDT.setHours(prevx.getHours());
-		thisDT.setMinutes(prevx.getMinutes());
-		thisDT.setSeconds(prevx.getSeconds());
-		thisDT.setTime(prevx.getTime() - (10000*i));
-		chartData1.push({x: thisDT,y: 0});
-		chartData2.push({x: thisDT,y: 0});
-		chartData3.push({x: thisDT,y: 0});
-	};
-	defineChart();
-}
-
-function TimeFix(thisValue){
-	if(thisValue < 10){return '0' + thisValue;};
-	return thisValue;
-}
-
-function defineChart(){
-	window.chartColors = {
-		red: 'rgb(255, 0, 0)',
-		orange: 'rgb(255, 159, 64)',
-		yellow: 'rgb(255, 205, 86)',
-		green: 'rgb(0, 192, 0)',
-		blue: 'rgb(0, 0, 255)',
-		purple: 'rgb(238, 130, 238)',
-		grey: 'rgb(201, 203, 207)'
-	};
 	
-	var color = Chart.helpers.color;
-	var ctx = document.getElementById('myChart').getContext('2d');
-	myChart = new Chart(ctx, {
-		type: 'line',
-		data: {
-			datasets: [{
-				label: 'Zinc Temp',
-				data: chartData1,
-				backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.red,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.2,
-				borderWidth: 2,
-				yAxisID: 'y'
-			},{
-				label: 'Output',
-				data: chartData2,
-				backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.blue,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.2,
-				borderWidth: 2,
-				yAxisID: 'y1'
-			},{
-				label: 'Zinc Setpoint',
-				data: chartData3,
-				backgroundColor: color(window.chartColors.purple).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.purple,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.1,
-				borderWidth: 1,
-				yAxisID: 'y'
-			}]
-		},
-		options: {
-			animation: false,
-			maintainAspectRatio: false,
-			scales: {
-				y: {
-					suggestedMin: 400,
-					suggestedMin: 500,
-					type: 'linear',
-					display: true,
-					position: 'left'
-				},
-				y1: {
-					suggestedMin: 0,
-					suggestedMin: 100,
-					type: 'linear',
-					display: true,
-					position: 'right'
-				},
-				x: {
-					type: 'time',
-					time: {
-						unit: "second",
-						format: "HH:MM:SS"
-					}
-				}
-			}
-		}
-	});
-}
-
-function chartUpdate(ID){	
-	var prevx = new Date(); 
-	if(myChart.data.datasets[0].data.length > (chartCacheCount + (chartCacheCleared * 10)) || chartCacheCleared > chartCacheCount){
-		myChart.data.datasets[0].data.shift();
-		myChart.data.datasets[1].data.shift();
-		myChart.data.datasets[2].data.shift();
-		if(chartCacheCleared < chartCacheCount){chartCacheCleared++;};
-	};
-	myChart.data.datasets[0].data.push({x: prevx, y: (ModbusData[ID].ZINC_TEMP_PV/10)});
-	myChart.data.datasets[1].data.push({x: prevx, y: ModbusData[ID].PID_SEL_OP/10});
-	myChart.data.datasets[2].data.push({x: prevx, y: ModbusData[ID].ZINC_PID_SP/10});
-	myChart.update();
 }
 
 function decAdj(intVal,divFactor,decP){
@@ -384,6 +402,106 @@ function INTOTBOOL(MyIntVal){
 	return thisBitArray;
 }
 
+function SIMBRNDIG(DIGVAL){
+	var DIGRESULT = 0;
+	switch(DIGVAL){
+		case 1:
+			DIGRESULT = 2;break;
+		case 2:
+			DIGRESULT = 4;break;
+		case 4:
+			DIGRESULT = 8;break;
+		case 8:
+			DIGRESULT = 16;break;
+		case 16:
+			DIGRESULT = 32;break;
+		case 32:
+			DIGRESULT = 64;break;
+		case 64:
+			DIGRESULT = 128;break;
+		case 128:
+			DIGRESULT = 1;break;
+	}
+	return DIGRESULT;
+}
+
+function SIMCONVEYORDIG(){
+	var DIGRESULT = 0;
+	switch(ConveyorSimSEQ){
+		case 0:DIGRESULT = 12;break;
+		case 1:DIGRESULT = 13;break;
+		case 2:DIGRESULT = 5;break;
+		case 3:DIGRESULT = 21;break;
+		case 4:DIGRESULT = 20;break;
+		case 5:DIGRESULT = 21;break;
+		case 6:DIGRESULT = 5;break;
+		case 7:DIGRESULT = 37;break;
+		case 8:DIGRESULT = 36;break;
+		case 9:DIGRESULT = 37;break;
+		case 10:DIGRESULT = 5;break;
+		case 11:DIGRESULT = 69;break;
+		case 12:DIGRESULT = 68;break;
+		case 13:DIGRESULT = 69;break;
+		case 14:DIGRESULT = 5;break;
+		case 15:DIGRESULT = 133;break;
+		case 16:DIGRESULT = 132;break;
+		case 17:DIGRESULT = 44;break;
+		case 18:DIGRESULT = 45;break;
+		case 19:DIGRESULT = 13;break;
+		case 20:DIGRESULT = 5;break;
+		case 21:DIGRESULT = 69;break;
+		case 22:DIGRESULT = 85;break;
+		case 23:DIGRESULT = 84;break;
+		case 24:DIGRESULT = 85;break;
+		case 25:DIGRESULT = 21;break;
+		case 26:DIGRESULT = 5;break;
+		case 27:DIGRESULT = 133;break;
+		case 28:DIGRESULT = 165;break;
+		case 29:DIGRESULT = 164;break;
+		case 30:DIGRESULT = 60;break;
+		case 31:DIGRESULT = 61;break;
+		case 32:DIGRESULT = 29;break;
+		case 33:DIGRESULT = 13;break;
+		case 34:DIGRESULT = 5;break;
+		case 35:DIGRESULT = 69;break;
+		case 36:DIGRESULT = 101;break;
+		case 37:DIGRESULT = 117;break;
+		case 38:DIGRESULT = 116;break;
+		case 39:DIGRESULT = 117;break;
+		case 40:DIGRESULT = 53;break;
+		case 41:DIGRESULT = 21;break;
+		case 42:DIGRESULT = 5;break;
+		case 43:DIGRESULT = 133;break;
+		case 44:DIGRESULT = 197;break;
+		case 45:DIGRESULT = 229;break;
+		case 46:DIGRESULT = 228;break;
+	}
+	
+	if(ConveyorSimSEQ>46){ConveyorSimSEQ=0;};
+	return DIGRESULT;
+}
+
+function SIMDRYERDIG(){
+	var DIGRESULT = 0;
+	switch(dryerSimSEQ){
+		case 0:DIGRESULT = 175;break;
+		case 1:DIGRESULT = 47;break;
+		case 2:DIGRESULT = 111;break;
+		case 3:DIGRESULT = 79;break;
+		case 4:DIGRESULT = 93;break;
+		case 5:DIGRESULT = 31;break;
+		case 6:DIGRESULT = 159;break;
+		case 7:DIGRESULT = 143;break;
+		case 8:DIGRESULT = 175;break;
+		case 9:DIGRESULT = 15;break;
+		case 10:DIGRESULT = 95;break;
+		case 11:DIGRESULT = 15;break;
+	}
+	
+	if(dryerSimSEQ>11){dryerSimSEQ=0;};
+	return DIGRESULT;
+}
+
 function decodeBurner(ID,BurnerID){
 	switch(BurnerID){
 		case 1:
@@ -465,30 +583,53 @@ function decodeSystem(ID){
 }
 
 function decodeDryer(ID){
-	var thisArray = INTOTBOOL(ModbusData[ID].DRY_INT);
-	ModbusData[ID].DRY_FAN_CB = 	thisArray[0];
-	ModbusData[ID].DRY_FAN_FAULT = 	thisArray[1];
-	ModbusData[ID].DRY_FAN_STATE = 	thisArray[2];
-	ModbusData[ID].DRY_FAN_AM = 	thisArray[3];
-	ModbusData[ID].LD_OPEN = 		thisArray[4];
-	ModbusData[ID].LD_CLOSED = 		thisArray[5];
-	ModbusData[ID].UD_OPEN = 		thisArray[6];
-	ModbusData[ID].UD_CLOSED = 		thisArray[7];
+	if (ModbusData[ID].DRY_INT === undefined || ModbusData[ID].DRY_INT == 0) {
+        ModbusData[ID].DRY_FAN_CB = 	false;
+		ModbusData[ID].DRY_FAN_FAULT = 	false;
+		ModbusData[ID].DRY_FAN_STATE = 	false;
+		ModbusData[ID].DRY_FAN_AM = 	false;
+		ModbusData[ID].LD_OPEN = 		false;
+		ModbusData[ID].LD_CLOSED = 		true;
+		ModbusData[ID].UD_OPEN = 		false;
+		ModbusData[ID].UD_CLOSED = 		true;
+    } else {
+		var thisArray = INTOTBOOL(ModbusData[ID].DRY_INT);
+        ModbusData[ID].DRY_FAN_CB = 	thisArray[0];
+		ModbusData[ID].DRY_FAN_FAULT = 	thisArray[1];
+		ModbusData[ID].DRY_FAN_STATE = 	thisArray[2];
+		ModbusData[ID].DRY_FAN_AM = 	thisArray[3];
+		ModbusData[ID].LD_OPEN = 		thisArray[4];
+		ModbusData[ID].LD_CLOSED = 		thisArray[5];
+		ModbusData[ID].UD_OPEN = 		thisArray[6];
+		ModbusData[ID].UD_CLOSED = 		thisArray[7];
+    }
 }
 
 function decodeConveyor(ID){
-	var thisArray = INTOTBOOL(ModbusData[ID].CON_INT);
-	ModbusData[ID].CON_Forward = 	thisArray[0];
-	ModbusData[ID].CON_Reverse = 	thisArray[1];
-	ModbusData[ID].CON_OT =     	thisArray[2];
-	ModbusData[ID].CON_POS_1  = 	thisArray[3];
-	ModbusData[ID].CON_POS_2 = 		thisArray[4];
-	ModbusData[ID].CON_POS_3 = 		thisArray[5];
-	ModbusData[ID].CON_POS_4 = 		thisArray[6];
-	ModbusData[ID].CON_POS_5 = 		thisArray[7];
+	if (ModbusData[ID].CON_INT === undefined || ModbusData[ID].CON_INT == 0) {
+        ModbusData[ID].CON_Forward = 	false;
+		ModbusData[ID].CON_Reverse = 	false;
+		ModbusData[ID].CON_OT =     	true;
+		ModbusData[ID].CON_POS_1  = 	false;
+		ModbusData[ID].CON_POS_2 = 		false;
+		ModbusData[ID].CON_POS_3 = 		false;
+		ModbusData[ID].CON_POS_4 = 		false;
+		ModbusData[ID].CON_POS_5 = 		false;
+    } else {
+		var thisArray = INTOTBOOL(ModbusData[ID].CON_INT);
+        ModbusData[ID].CON_Forward = 	thisArray[0];
+		ModbusData[ID].CON_Reverse = 	thisArray[1];
+		ModbusData[ID].CON_OT =     	thisArray[2];
+		ModbusData[ID].CON_POS_1  = 	thisArray[3];
+		ModbusData[ID].CON_POS_2 = 		thisArray[4];
+		ModbusData[ID].CON_POS_3 = 		thisArray[5];
+		ModbusData[ID].CON_POS_4 = 		thisArray[6];
+		ModbusData[ID].CON_POS_5 = 		thisArray[7];
+    }
 }
 
 function updateHMI(ID) {
+	
 	pulseFlag = !pulseFlag;
 	decodeBurner(ID,1);
 	decodeBurner(ID,2);
@@ -499,17 +640,7 @@ function updateHMI(ID) {
 	decodeSystem(ID);
 	decodeDryer(ID);
 	decodeConveyor(ID);
-	
-	//testing//
-	//ModbusData[ID].LD_OPEN = true;
-	//ModbusData[ID].UD_CLOSED = true;
-	//ModbusData[ID].DRY_FAN_CB = true;
-	//ModbusData[ID].DRY_FAN_FAULT = true;
-	//ModbusData[ID].DRY_FAN_STATE = true;
-	//ModbusData[ID].DRY_SPEED = 100;
-	//ModbusData[ID].DRY_FAN_AM = true;
-	//testimg//
-	
+
 	var FurnaceID = CustomerData[ID].Customer + "_" + CustomerData[ID].FurnaceID;
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCTEMP').innerHTML = decAdj(ModbusData[ID].ZINC_TEMP_PV,10,1) + " °C";
 	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCSP').innerHTML = decAdj(ModbusData[ID].ZINC_PID_SP,10,0) + " °C";
@@ -529,16 +660,16 @@ function updateHMI(ID) {
 		document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERSP').innerHTML = ModbusData[ID].DRY_OUT + " °C";
 		document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSPEED').innerHTML = ModbusData[ID].DRY_SPEED + " %"; //decAdj(ModbusData[ID].DRY_SPEED,10,0) + " %";
 		document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSP').innerHTML = decAdj(ModbusData[ID].DRY_SP,10,0) + " °C";
-		setDryerDoor(FurnaceID + '_DRYER_LD_O',ModbusData[ID].LD_OPEN);
-		setDryerDoor(FurnaceID + '_DRYER_LD_C',ModbusData[ID].LD_CLOSED);
-		setDryerDoor(FurnaceID + '_DRYER_UD_O',ModbusData[ID].UD_OPEN);
-		setDryerDoor(FurnaceID + '_DRYER_UD_C',ModbusData[ID].UD_CLOSED);
+		//setDryerDoor(FurnaceID + '_DRYER_LD_O',ModbusData[ID].LD_OPEN);
+		//setDryerDoor(FurnaceID + '_DRYER_LD_C',ModbusData[ID].LD_CLOSED);
+		//setDryerDoor(FurnaceID + '_DRYER_UD_O',ModbusData[ID].UD_OPEN);
+		//setDryerDoor(FurnaceID + '_DRYER_UD_C',ModbusData[ID].UD_CLOSED);
 		if(ModbusData[ID].DRY_FAN_CB){
-			document.getElementById(FurnaceID + '_DRYER_CB').innerText = 'Circuit Breaker - ON';
+			document.getElementById(FurnaceID + '_DRYER_CB').innerText = TEXTARRAY[17][LANSEL] + ' = ' + TEXTARRAY[20][LANSEL];//'Circuit Breaker - ON';
 			document.getElementById(FurnaceID + '_DRYER_CB').style.backgroundColor = 'grey';
 			document.getElementById(FurnaceID + '_DRYER_CB').style.color = 'lightgreen';
 		} else {
-			document.getElementById(FurnaceID + '_DRYER_CB').innerText = 'Circuit Breaker - OFF';
+			document.getElementById(FurnaceID + '_DRYER_CB').innerText = TEXTARRAY[17][LANSEL] + ' - ' + TEXTARRAY[21][LANSEL];//'Circuit Breaker - OFF';
 			document.getElementById(FurnaceID + '_DRYER_CB').style.backgroundColor = '';
 			document.getElementById(FurnaceID + '_DRYER_CB').style.color = '';
 		};
@@ -550,26 +681,25 @@ function updateHMI(ID) {
 			//document.getElementById(FurnaceID + '_DRYER_FAN_BOX_BOT').style.color = 'red';
 		}
 		if(ModbusData[ID].DRY_FAN_STATE){
-			document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = 'ON';
+			document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = TEXTARRAY[20][LANSEL];//'ON';
 			document.getElementById(FurnaceID + '_DRYER_STATUS').style.backgroundColor = 'grey';
 			document.getElementById(FurnaceID + '_DRYER_STATUS').style.color = 'lightgreen';
 		} else {
-			document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = 'OFF';
+			document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = TEXTARRAY[21][LANSEL];//'OFF';
 			document.getElementById(FurnaceID + '_DRYER_STATUS').style.backgroundColor = '';
 			document.getElementById(FurnaceID + '_DRYER_STATUS').style.color = '';
 		}
 		if(ModbusData[ID].DRY_FAN_AM){
-			document.getElementById(FurnaceID + '_DRYER_MODE').innerText = 'AUTO';
+			document.getElementById(FurnaceID + '_DRYER_MODE').innerText = TEXTARRAY[18][LANSEL];//'AUTO';
 			document.getElementById(FurnaceID + '_DRYER_MODE').style.backgroundColor = 'green';
 			document.getElementById(FurnaceID + '_DRYER_MODE').style.color = 'black';
 		} else {
-			document.getElementById(FurnaceID + '_DRYER_MODE').innerText = 'MANUAL';
+			document.getElementById(FurnaceID + '_DRYER_MODE').innerText = TEXTARRAY[19][LANSEL];//'MANUAL';
 			document.getElementById(FurnaceID + '_DRYER_MODE').style.backgroundColor = '';
 			document.getElementById(FurnaceID + '_DRYER_MODE').style.color = '';
 		}
-		
 	}
-	document.getElementById(FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK_TEXT').innerHTML = CustomerData[ID].FurnaceID;
+	document.getElementById(FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK_TEXT').innerHTML = thisFurnaceIDArray[LANSEL];
 	setBurnerGroup(FurnaceID,'1',ModbusData[ID].A1_PVALVE,ModbusData[ID].A1_SGAS,ModbusData[ID].A1_FAULT)
 	setBurnerGroup(FurnaceID,'2',ModbusData[ID].A2_PVALVE,ModbusData[ID].A2_SGAS,ModbusData[ID].A2_FAULT)
 	setBurnerGroup(FurnaceID,'3',ModbusData[ID].B1_PVALVE,ModbusData[ID].B1_SGAS,ModbusData[ID].B1_FAULT)
@@ -585,7 +715,16 @@ function updateHMI(ID) {
 	setPurgeState(FurnaceID,1,ModbusData[ID].ZAPurge,ModbusData[ID].ZAPComp);
 	setPurgeState(FurnaceID,2,ModbusData[ID].ZBPurge,ModbusData[ID].ZBPComp);
 	setSystemState(FurnaceID,ModbusData[ID].SYS_ON);
-	if(ModbusData[ID].ZINC_TEMP_PV > 0){chartUpdate(ID);};
+	//if(ModbusData[ID].ZINC_TEMP_PV > 0){chartUpdate(ID);};
+}
+
+function updateHMIFAST(ID) {
+	var FurnaceID = CustomerData[ID].Customer + "_" + CustomerData[ID].FurnaceID;
+	if(thisDryer){
+		setCONVDoors(ID,FurnaceID);
+		setCONVAction(ID,FurnaceID);
+		setJIGs(ID,FurnaceID);
+	}
 }
 
 function setDryerDoor(DoorID,DoorStatus){
@@ -797,10 +936,10 @@ function setPurgeState(FurnaceID,ID,PurgeState1,PurgeState2){
 function setSystemState(FurnaceID,sysState){
 	var SYSTEM_DIV = document.getElementById(FurnaceID + '_HMI_SECTION_MIDDLE_TOP_SYS');
 	if(sysState){
-		SYSTEM_DIV.innerText = 'System ON';
+		SYSTEM_DIV.innerText = TEXTARRAY[6][LANSEL];//'System ON';
 		SYSTEM_DIV.style.backgroundColor = 'rgb(0, 230, 0)';
 	} else {
-		SYSTEM_DIV.innerText = 'System OFF';
+		SYSTEM_DIV.innerText = TEXTARRAY[5][LANSEL];//'System OFF';
 		SYSTEM_DIV.style.backgroundColor = '';
 	}
 }
@@ -817,7 +956,7 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	var LANDING_PARAM = document.createElement("div");
 	var LANDING_TREND = document.createElement("div");
 	var LANDING_TREND_FOREGROUND = document.createElement("div");
-	var LANDINF_TREND_CANVAS = document.createElement("canvas");
+	//var LANDINF_TREND_CANVAS = document.createElement("canvas");
 	LANDING.appendChild(LANDING_HMI);
 	LANDING_HMI.appendChild(LANDING_HMI_CONTROLS);
 	LANDING_HMI.appendChild(LANDING_HMI_GRAPHICS);
@@ -827,7 +966,7 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	LANDING.appendChild(LANDING_PARAM);
 	LANDING.appendChild(LANDING_TREND);
 	LANDING.appendChild(LANDING_TREND_FOREGROUND);
-	LANDING_TREND.appendChild(LANDINF_TREND_CANVAS);
+	//LANDING_TREND.appendChild(LANDINF_TREND_CANVAS);
 	
 	LANDING.setAttribute('id',FurnaceID + '_LANDING');
 	LANDING.setAttribute('class','landing');
@@ -859,15 +998,17 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	LANDING_TREND_FOREGROUND.setAttribute('style','display:none;');
 	//LANDING_TREND_FOREGROUND.setAttribute('onClick','MiddleHMIClicked(this);');
 	
-	LANDINF_TREND_CANVAS.setAttribute('id','myChart');
-	LANDINF_TREND_CANVAS.setAttribute('class','myChart');
+	//LANDINF_TREND_CANVAS.setAttribute('id','myChart');
+	//LANDINF_TREND_CANVAS.setAttribute('class','myChart');
 	
 	ParentDiv.appendChild(LANDING);
 	createHMIControls(FurnaceID + '_LANDING_HMI_CONTROLS',FurnaceID,IncludeDips);
 	createHMISections(FurnaceID + '_LANDING_HMI_GRAPHICS',BurnerCount,FurnaceID);
-	createDRYERControls(FurnaceID + '_LANDING_DRYER_CONTROLS',FurnaceID,IncludeDips);
-	createDRYERSections(FurnaceID + '_LANDING_DRYER_GRAPHICS',FurnaceID);
-	//defineChart();
+	if(thisDryer){
+		createDRYERControls(FurnaceID + '_LANDING_DRYER_CONTROLS',FurnaceID,IncludeDips);
+		createDRYERSections(FurnaceID + '_LANDING_DRYER_GRAPHICS',FurnaceID);
+		createCONVEYORSections(FurnaceID);
+	};
 }
 
 function MiddleHMIClicked(ElementData){
@@ -1108,12 +1249,12 @@ function createHMIControls(ParentDivName,FurnaceID,IncludeDips){
 	HMI_CONTROLS_GASFLOW_WRAPPER.appendChild(HMI_CONTROLS_GASFLOW);
 	ParentDiv.appendChild(HMI_CONTROLS_ROW_1);
 	ParentDiv.appendChild(HMI_CONTROLS_ROW_2);
-	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCTEMP_LABEL').innerText = "Zinc Temp";
-	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUETEMP_LABEL').innerText = "Flue Temp";
-	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCSP_LABEL').innerText = "Setpoint";
-	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUESP_LABEL').innerText = "Setpoint";
-	document.getElementById(FurnaceID + '_HMI_CONTROLS_OUTPUT_LABEL').innerText = "Output";
-	if(thisFlowRate){document.getElementById(FurnaceID + '_HMI_CONTROLS_GASFLOW_LABEL').innerText = "Gas Flow";};
+	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCTEMP_LABEL').innerText = TEXTARRAY[0][LANSEL];//"Zinc Temp";
+	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUETEMP_LABEL').innerText = TEXTARRAY[1][LANSEL];//"Flue Temp";
+	document.getElementById(FurnaceID + '_HMI_CONTROLS_ZINCSP_LABEL').innerText =   TEXTARRAY[2][LANSEL];//"Setpoint";
+	document.getElementById(FurnaceID + '_HMI_CONTROLS_FLUESP_LABEL').innerText =   TEXTARRAY[2][LANSEL];//"Setpoint";
+	document.getElementById(FurnaceID + '_HMI_CONTROLS_OUTPUT_LABEL').innerText =   TEXTARRAY[3][LANSEL];//"Output";
+	if(thisFlowRate){document.getElementById(FurnaceID + '_HMI_CONTROLS_GASFLOW_LABEL').innerText = TEXTARRAY[4][LANSEL];};//Gas Flow;
 }
 
 function createDRYERControls(ParentDivName,FurnaceID,IncludeDips){
@@ -1206,22 +1347,24 @@ function createDRYERControls(ParentDivName,FurnaceID,IncludeDips){
 	DRY_CONTROLS_FANSP_WRAPPER.appendChild(DRY_CONTROLS_FANSP);
 	ParentDiv.appendChild(DRY_CONTROLS_ROW_1);
 	ParentDiv.appendChild(DRY_CONTROLS_ROW_2);
-	document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP_LABEL').innerText = "Ex In";
-	document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERINTEMP_LABEL').innerText = "Dryer In";
-	document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGSP_LABEL').innerText = "Ex Out";
-	document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERSP_LABEL').innerText = "Dryer Out";
-	document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSPEED_LABEL').innerText = "Fan Speed";
-	document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSP_LABEL').innerText = "Setpoint";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGINTEMP_LABEL').innerText = 	TEXTARRAY[12][LANSEL];//"Ex In";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERINTEMP_LABEL').innerText = 	TEXTARRAY[14][LANSEL];//"Dryer In";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_EXCHGSP_LABEL').innerText = 		TEXTARRAY[13][LANSEL];//"Ex Out";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_DRYERSP_LABEL').innerText = 		TEXTARRAY[15][LANSEL];//"Dryer Out";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSPEED_LABEL').innerText = 	TEXTARRAY[16][LANSEL];//"Fan Speed";
+	document.getElementById(FurnaceID + '_DRY_CONTROLS_FANSP_LABEL').innerText = 		TEXTARRAY[2][LANSEL];//"Setpoint";
 }
 
 function createDRYERSections(ParentDivName,FurnaceID){
 	var ParentDiv = document.getElementById(ParentDivName);
-	var DRYER_SECTION_LEFT = document.createElement("div");
+	var DRYER_SECTION_TOP = document.createElement("div");
+	var DRYER_SECTION_BOT = document.createElement("div");
+	//var DRYER_SECTION_LEFT = document.createElement("div");
 	var DRYER_SECTION_RIGHT = document.createElement("div");
-	var DRYER_LD_O = document.createElement("div");
-	var DRYER_LD_C = document.createElement("div");
-	var DRYER_UD_O = document.createElement("div");
-	var DRYER_UD_C = document.createElement("div");
+	//var DRYER_LD_O = document.createElement("div");
+	//var DRYER_LD_C = document.createElement("div");
+	//var DRYER_UD_O = document.createElement("div");
+	//var DRYER_UD_C = document.createElement("div");
 	var DRYER_SECTION_RIGHT_TOP = document.createElement("div");
 	var DRYER_SECTION_RIGHT_MID = document.createElement("div");
 	var DRYER_SECTION_RIGHT_BOT_1 = document.createElement("div");
@@ -1234,17 +1377,23 @@ function createDRYERSections(ParentDivName,FurnaceID){
 	var DRYER_STATUS = document.createElement("div");
 	var DRYER_MODE = document.createElement("div");
 	
-	DRYER_SECTION_LEFT.setAttribute('id',FurnaceID + '_DRYER_SECTION_LEFT');
-	DRYER_SECTION_LEFT.setAttribute('class','DRYER_SECTION_LEFT');
+	DRYER_SECTION_TOP.setAttribute('id',FurnaceID + 'DRYER_SECTION_TOP');
+	DRYER_SECTION_TOP.setAttribute('class','DRYER_SECTION_TOP');
 	
-	DRYER_LD_O.setAttribute('id',FurnaceID + '_DRYER_LD_O');
-	DRYER_LD_O.setAttribute('class','DRYER_DOOR');
-	DRYER_LD_C.setAttribute('id',FurnaceID + '_DRYER_LD_C');
-	DRYER_LD_C.setAttribute('class','DRYER_DOOR');
-	DRYER_UD_O.setAttribute('id',FurnaceID + '_DRYER_UD_O');
-	DRYER_UD_O.setAttribute('class','DRYER_DOOR');
-	DRYER_UD_C.setAttribute('id',FurnaceID + '_DRYER_UD_C');
-	DRYER_UD_C.setAttribute('class','DRYER_DOOR');
+	DRYER_SECTION_BOT.setAttribute('id',FurnaceID + 'DRYER_SECTION_BOT');
+	DRYER_SECTION_BOT.setAttribute('class','DRYER_SECTION_BOT');
+	
+	//DRYER_SECTION_LEFT.setAttribute('id',FurnaceID + '_DRYER_SECTION_LEFT');
+	//DRYER_SECTION_LEFT.setAttribute('class','DRYER_SECTION_LEFT');
+	
+	//DRYER_LD_O.setAttribute('id',FurnaceID + '_DRYER_LD_O');
+	//DRYER_LD_O.setAttribute('class','DRYER_DOOR');
+	//DRYER_LD_C.setAttribute('id',FurnaceID + '_DRYER_LD_C');
+	//DRYER_LD_C.setAttribute('class','DRYER_DOOR');
+	//DRYER_UD_O.setAttribute('id',FurnaceID + '_DRYER_UD_O');
+	//DRYER_UD_O.setAttribute('class','DRYER_DOOR');
+	//DRYER_UD_C.setAttribute('id',FurnaceID + '_DRYER_UD_C');
+	//DRYER_UD_C.setAttribute('class','DRYER_DOOR');
 	
 	DRYER_SECTION_RIGHT.setAttribute('id',FurnaceID + '_DRYER_SECTION_RIGHT');
 	DRYER_SECTION_RIGHT.setAttribute('class','DRYER_SECTION_RIGHT');
@@ -1282,12 +1431,14 @@ function createDRYERSections(ParentDivName,FurnaceID){
 	DRYER_MODE.setAttribute('id',FurnaceID + '_DRYER_MODE');
 	DRYER_MODE.setAttribute('class','DRYER_MODE');
 	
-	ParentDiv.appendChild(DRYER_SECTION_LEFT);
-	DRYER_SECTION_LEFT.appendChild(DRYER_LD_O);
-	DRYER_SECTION_LEFT.appendChild(DRYER_LD_C);
-	DRYER_SECTION_LEFT.appendChild(DRYER_UD_O);
-	DRYER_SECTION_LEFT.appendChild(DRYER_UD_C);
-	ParentDiv.appendChild(DRYER_SECTION_RIGHT);
+	ParentDiv.appendChild(DRYER_SECTION_TOP);
+	ParentDiv.appendChild(DRYER_SECTION_BOT);
+	//DRYER_SECTION_TOP.appendChild(DRYER_SECTION_LEFT);
+	//DRYER_SECTION_LEFT.appendChild(DRYER_LD_O);
+	//DRYER_SECTION_LEFT.appendChild(DRYER_LD_C);
+	//DRYER_SECTION_LEFT.appendChild(DRYER_UD_O);
+	//DRYER_SECTION_LEFT.appendChild(DRYER_UD_C);
+	DRYER_SECTION_TOP.appendChild(DRYER_SECTION_RIGHT);
 	DRYER_SECTION_RIGHT.appendChild(DRYER_SECTION_RIGHT_TOP);
 	DRYER_SECTION_RIGHT.appendChild(DRYER_SECTION_RIGHT_MID);
 	DRYER_SECTION_RIGHT.appendChild(DRYER_SECTION_RIGHT_BOT_1);
@@ -1298,16 +1449,744 @@ function createDRYERSections(ParentDivName,FurnaceID){
 	DRYER_FAN_BOX_TOP.appendChild(DRYER_FAN_BLADE);
 	DRYER_FAN_BOX_TOP.appendChild(DRYER_FAN_COVER);
 	DRYER_SECTION_RIGHT_BOT_1.appendChild(DRYER_STATUS);
-	DRYER_SECTION_RIGHT_BOT_2.appendChild(DRYER_MODE);
-	
-	document.getElementById(FurnaceID + '_DRYER_LD_O').innerText = 'LOAD DOOR - OPEN';
-	document.getElementById(FurnaceID + '_DRYER_LD_C').innerText = 'LOAD DOOR - CLOSED';
-	document.getElementById(FurnaceID + '_DRYER_UD_O').innerText = 'UNLOAD DOOR - OPEN';
-	document.getElementById(FurnaceID + '_DRYER_UD_C').innerText = 'UNLOAD DOOR - CLOSED';
-	document.getElementById(FurnaceID + '_DRYER_CB').innerText = 'Circuit Breaker - OFF';
+	DRYER_SECTION_RIGHT_BOT_2.appendChild(DRYER_MODE);	
+	document.getElementById(FurnaceID + '_DRYER_CB').innerText = TEXTARRAY[17][LANSEL] + ' - ' + TEXTARRAY[21][LANSEL]; //'Circuit Breaker - OFF';
 	document.getElementById(FurnaceID + '_DRYER_FAN_BOX_BOT').innerText = '0%';
-	document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = 'OFF';
-	document.getElementById(FurnaceID + '_DRYER_MODE').innerText = 'MANUAL';
+	document.getElementById(FurnaceID + '_DRYER_STATUS').innerText = TEXTARRAY[21][LANSEL];//'OFF';
+	document.getElementById(FurnaceID + '_DRYER_MODE').innerText = TEXTARRAY[18][LANSEL]//'MANUAL';
+}
+
+function createCONVEYORSections(FurnaceID){
+	var ParentDiv = document.getElementById(FurnaceID + 'DRYER_SECTION_BOT');
+	var CONV_DOORS = document.createElement("div");
+	var CONV_DOOR_LEFT = document.createElement("div");
+	var CONV_DOOR_LEFT_1 = document.createElement("div");
+	var CONV_DOOR_LEFT_2 = document.createElement("div");
+	var CONV_DOOR_LEFT_3 = document.createElement("div");
+	var CONV_DOOR_LEFT_4 = document.createElement("div");
+	var CONV_DOOR_RIGHT = document.createElement("div");
+	var CONV_DOOR_RIGHT_1 = document.createElement("div");
+	var CONV_DOOR_RIGHT_2 = document.createElement("div");
+	var CONV_DOOR_RIGHT_3 = document.createElement("div");
+	var CONV_DOOR_RIGHT_4 = document.createElement("div");
+	var CONV_ROW_1 = document.createElement("div");
+	var CONV_ROW_1_1 = document.createElement("div");
+	var CONV_ROW_1_2 = document.createElement("div");
+	var CONV_ROW_1_3 = document.createElement("div");
+	var CONV_ROW_1_4 = document.createElement("div");
+	var CONV_ROW_1_5 = document.createElement("div");
+	var CONV_ROW_2 = document.createElement("div");
+	var CONV_ROW_2_1 = document.createElement("div");
+	var CONV_ROW_2_2 = document.createElement("div");
+	var CONV_ROW_2_3 = document.createElement("div");
+	var CONV_ROW_3 = document.createElement("div");
+	var CONV_ROW_3_1 = document.createElement("div");
+	var CONV_ROW_3_2 = document.createElement("div");
+	var CONV_JIG_1 = document.createElement("div");
+	var CONV_JIG_2 = document.createElement("div");
+	var CONV_JIG_3 = document.createElement("div");
+	var CONV_JIG_4 = document.createElement("div");
+	var CONV_JIG_5 = document.createElement("div");
+	var CONV_JIG_6 = document.createElement("div");
+	var CONV_JIG_7 = document.createElement("div");
+	var CONV_JIG_8 = document.createElement("div");
+	var CONV_JIG_9 = document.createElement("div");
+	var CONV_JIG_10 = document.createElement("div");
+	var CONV_JIG_11 = document.createElement("div");
+	var CONV_JIG_12 = document.createElement("div");
+	var CONV_JIG_13 = document.createElement("div");
+	var CONV_JIG_14 = document.createElement("div");
+	var CONV_JIG_15 = document.createElement("div");
+	var CONV_JIG_16 = document.createElement("div");
+	var CONV_JIG_17 = document.createElement("div");
+	//var CONV_JIG_18 = document.createElement("div");
+	//var CONV_JIG_19 = document.createElement("div");
+	//var CONV_JIG_20 = document.createElement("div");
+	//var CONV_JIG_21 = document.createElement("div");
+	//var CONV_JIG_22 = document.createElement("div");
+	var CONV_ROW_3_3 = document.createElement("div");
+	var CONV_ROW_3_4 = document.createElement("div");
+	var CONV_CONV = document.createElement("div");
+	var CONV_CONV_ROW_1 = document.createElement("div");
+	var CONV_CONV_ROW_2 = document.createElement("div");
+	var CONV_CONV_ROW_3 = document.createElement("div");
+	var CV_1_SC_1_LK_1 = document.createElement("div");  var CV_1_SC_1_LK_2 = document.createElement("div");  var CV_1_SC_1_LK_3 = document.createElement("div");
+	var CV_1_SC_2_LK_1 = document.createElement("div");  var CV_1_SC_2_LK_2 = document.createElement("div");  var CV_1_SC_2_LK_3 = document.createElement("div");
+	var CV_1_SC_3_LK_1 = document.createElement("div");  var CV_1_SC_3_LK_2 = document.createElement("div");  var CV_1_SC_3_LK_3 = document.createElement("div");
+	var CV_1_SC_4_LK_1 = document.createElement("div");  var CV_1_SC_4_LK_2 = document.createElement("div");  var CV_1_SC_4_LK_3 = document.createElement("div");
+	var CV_1_SC_5_LK_1 = document.createElement("div");  var CV_1_SC_5_LK_2 = document.createElement("div");  var CV_1_SC_5_LK_3 = document.createElement("div");
+	var CV_1_SC_6_LK_1 = document.createElement("div");  var CV_1_SC_6_LK_2 = document.createElement("div");  var CV_1_SC_6_LK_3 = document.createElement("div");
+	var CV_1_SC_7_LK_1 = document.createElement("div");  var CV_1_SC_7_LK_2 = document.createElement("div");  var CV_1_SC_7_LK_3 = document.createElement("div");
+	var CV_1_SC_8_LK_1 = document.createElement("div");  var CV_1_SC_8_LK_2 = document.createElement("div");  var CV_1_SC_8_LK_3 = document.createElement("div");
+	var CV_1_SC_9_LK_1 = document.createElement("div");  var CV_1_SC_9_LK_2 = document.createElement("div");  var CV_1_SC_9_LK_3 = document.createElement("div");
+	var CV_1_SC_10_LK_1 = document.createElement("div"); var CV_1_SC_10_LK_2 = document.createElement("div"); var CV_1_SC_10_LK_3 = document.createElement("div");
+	var CV_1_SC_11_LK_1 = document.createElement("div"); var CV_1_SC_11_LK_2 = document.createElement("div"); var CV_1_SC_11_LK_3 = document.createElement("div");
+	var CV_1_SC_12_LK_1 = document.createElement("div"); var CV_1_SC_12_LK_2 = document.createElement("div"); var CV_1_SC_12_LK_3 = document.createElement("div");
+	var CV_1_SC_13_LK_1 = document.createElement("div"); var CV_1_SC_13_LK_2 = document.createElement("div"); var CV_1_SC_13_LK_3 = document.createElement("div");
+	var CV_1_SC_14_LK_1 = document.createElement("div"); var CV_1_SC_14_LK_2 = document.createElement("div"); var CV_1_SC_14_LK_3 = document.createElement("div");
+	var CV_1_SC_15_LK_1 = document.createElement("div"); var CV_1_SC_15_LK_2 = document.createElement("div"); var CV_1_SC_15_LK_3 = document.createElement("div");
+	var CV_1_SC_16_LK_1 = document.createElement("div"); var CV_1_SC_16_LK_2 = document.createElement("div"); var CV_1_SC_16_LK_3 = document.createElement("div");
+	var CV_1_SC_17_LK_1 = document.createElement("div"); var CV_1_SC_17_LK_2 = document.createElement("div"); var CV_1_SC_17_LK_3 = document.createElement("div");
+	var CV_1_SC_18_LK_1 = document.createElement("div"); var CV_1_SC_18_LK_2 = document.createElement("div"); var CV_1_SC_18_LK_3 = document.createElement("div");
+	var CV_1_SC_19_LK_1 = document.createElement("div"); var CV_1_SC_19_LK_2 = document.createElement("div"); var CV_1_SC_19_LK_3 = document.createElement("div");
+	var CV_1_SC_20_LK_1 = document.createElement("div"); var CV_1_SC_20_LK_2 = document.createElement("div"); var CV_1_SC_20_LK_3 = document.createElement("div");
+	var CV_2_SC_1_LK_1 = document.createElement("div");  var CV_2_SC_1_LK_2 = document.createElement("div");  var CV_2_SC_1_LK_3 = document.createElement("div");
+	var CV_2_CIRCLE_1 = document.createElement("div");
+	var CV_2_BAR = document.createElement("div");
+	var CV_2_CIRCLE_2 = document.createElement("div");
+	var CV_2_SC_2_LK_1 = document.createElement("div");  var CV_2_SC_2_LK_2 = document.createElement("div");  var CV_2_SC_2_LK_3 = document.createElement("div");
+	var CV_3_SC_1_LK_1 = document.createElement("div");  var CV_3_SC_1_LK_2 = document.createElement("div");  var CV_3_SC_1_LK_3 = document.createElement("div");
+	var CV_3_SC_2_LK_1 = document.createElement("div");  var CV_3_SC_2_LK_2 = document.createElement("div");  var CV_3_SC_2_LK_3 = document.createElement("div");
+	var CV_3_SC_3_LK_1 = document.createElement("div");  var CV_3_SC_3_LK_2 = document.createElement("div");  var CV_3_SC_3_LK_3 = document.createElement("div");
+	var CV_3_SC_4_LK_1 = document.createElement("div");  var CV_3_SC_4_LK_2 = document.createElement("div");  var CV_3_SC_4_LK_3 = document.createElement("div");
+	var CV_3_SC_5_LK_1 = document.createElement("div");  var CV_3_SC_5_LK_2 = document.createElement("div");  var CV_3_SC_5_LK_3 = document.createElement("div");
+	var CV_3_SC_6_LK_1 = document.createElement("div");  var CV_3_SC_6_LK_2 = document.createElement("div");  var CV_3_SC_6_LK_3 = document.createElement("div");
+	var CV_3_SC_7_LK_1 = document.createElement("div");  var CV_3_SC_7_LK_2 = document.createElement("div");  var CV_3_SC_7_LK_3 = document.createElement("div");
+	var CV_3_SC_8_LK_1 = document.createElement("div");  var CV_3_SC_8_LK_2 = document.createElement("div");  var CV_3_SC_8_LK_3 = document.createElement("div");
+	var CV_3_SC_9_LK_1 = document.createElement("div");  var CV_3_SC_9_LK_2 = document.createElement("div");  var CV_3_SC_9_LK_3 = document.createElement("div");
+	var CV_3_SC_10_LK_1 = document.createElement("div"); var CV_3_SC_10_LK_2 = document.createElement("div"); var CV_3_SC_10_LK_3 = document.createElement("div");
+	var CV_3_SC_11_LK_1 = document.createElement("div"); var CV_3_SC_11_LK_2 = document.createElement("div"); var CV_3_SC_11_LK_3 = document.createElement("div");
+	var CV_3_SC_12_LK_1 = document.createElement("div"); var CV_3_SC_12_LK_2 = document.createElement("div"); var CV_3_SC_12_LK_3 = document.createElement("div");
+	var CV_3_SC_13_LK_1 = document.createElement("div"); var CV_3_SC_13_LK_2 = document.createElement("div"); var CV_3_SC_13_LK_3 = document.createElement("div");
+	var CV_3_SC_14_LK_1 = document.createElement("div"); var CV_3_SC_14_LK_2 = document.createElement("div"); var CV_3_SC_14_LK_3 = document.createElement("div");
+	var CV_3_SC_15_LK_1 = document.createElement("div"); var CV_3_SC_15_LK_2 = document.createElement("div"); var CV_3_SC_15_LK_3 = document.createElement("div");
+	var CV_3_SC_16_LK_1 = document.createElement("div"); var CV_3_SC_16_LK_2 = document.createElement("div"); var CV_3_SC_16_LK_3 = document.createElement("div");
+	var CV_3_SC_17_LK_1 = document.createElement("div"); var CV_3_SC_17_LK_2 = document.createElement("div"); var CV_3_SC_17_LK_3 = document.createElement("div");
+	var CV_3_SC_18_LK_1 = document.createElement("div"); var CV_3_SC_18_LK_2 = document.createElement("div"); var CV_3_SC_18_LK_3 = document.createElement("div");
+	var CV_3_SC_19_LK_1 = document.createElement("div"); var CV_3_SC_19_LK_2 = document.createElement("div"); var CV_3_SC_19_LK_3 = document.createElement("div");
+	var CV_3_SC_20_LK_1 = document.createElement("div"); var CV_3_SC_20_LK_2 = document.createElement("div"); var CV_3_SC_20_LK_3 = document.createElement("div");
+	var CONV_ROW_4 = document.createElement("div");
+	var CONV_ROW_4_1 = document.createElement("div");
+	var CONV_ROW_4_2 = document.createElement("div");
+	var CONV_ROW_4_3 = document.createElement("div");
+	var CONV_ROW_5 = document.createElement("div");
+	
+	CONV_DOORS.setAttribute('id',FurnaceID + 'CONV_DOORS');
+	CONV_DOORS.setAttribute('class','CONV_DOORS');
+	CONV_DOOR_LEFT.setAttribute('id',FurnaceID + 'CONV_DOOR_LEFT');
+	CONV_DOOR_LEFT.setAttribute('class','CONV_DOOR_LEFT');
+	CONV_DOOR_LEFT_1.setAttribute('id',FurnaceID + 'CONV_DOOR_LEFT_1');
+	CONV_DOOR_LEFT_1.setAttribute('class','CONV_DOOR_LEFT_1');
+	CONV_DOOR_LEFT_2.setAttribute('id',FurnaceID + 'CONV_DOOR_LEFT_2');
+	CONV_DOOR_LEFT_2.setAttribute('class','CONV_DOOR_LEFT_1');
+	CONV_DOOR_LEFT_3.setAttribute('id',FurnaceID + 'CONV_DOOR_LEFT_3');
+	CONV_DOOR_LEFT_3.setAttribute('class','CONV_DOOR_LEFT_1');
+	CONV_DOOR_LEFT_4.setAttribute('id',FurnaceID + 'CONV_DOOR_LEFT_4');
+	CONV_DOOR_LEFT_4.setAttribute('class','CONV_DOOR_LEFT_1');
+	CONV_DOOR_RIGHT.setAttribute('id',FurnaceID + 'CONV_DOOR_RIGHT');
+	CONV_DOOR_RIGHT.setAttribute('class','CONV_DOOR_RIGHT');
+	CONV_DOOR_RIGHT_1.setAttribute('id',FurnaceID + 'CONV_DOOR_RIGHT_1');
+	CONV_DOOR_RIGHT_1.setAttribute('class','CONV_DOOR_RIGHT_1');
+	CONV_DOOR_RIGHT_2.setAttribute('id',FurnaceID + 'CONV_DOOR_RIGHT_2');
+	CONV_DOOR_RIGHT_2.setAttribute('class','CONV_DOOR_RIGHT_1');
+	CONV_DOOR_RIGHT_3.setAttribute('id',FurnaceID + 'CONV_DOOR_RIGHT_3');
+	CONV_DOOR_RIGHT_3.setAttribute('class','CONV_DOOR_RIGHT_1');
+	CONV_DOOR_RIGHT_4.setAttribute('id',FurnaceID + 'CONV_DOOR_RIGHT_4');
+	CONV_DOOR_RIGHT_4.setAttribute('class','CONV_DOOR_RIGHT_1');
+	CONV_ROW_1.setAttribute('id',FurnaceID + 'CONV_ROW_1');
+	CONV_ROW_1.setAttribute('class','CONV_ROW_1');
+	CONV_ROW_1_1.setAttribute('id',FurnaceID + 'CONV_ROW_1_1');
+	CONV_ROW_1_1.setAttribute('class','CONV_ROW_1_1');
+	CONV_ROW_1_2.setAttribute('id',FurnaceID + 'CONV_ROW_1_2');
+	CONV_ROW_1_2.setAttribute('class','CONV_ROW_1_2');
+	CONV_ROW_1_3.setAttribute('id',FurnaceID + 'CONV_ROW_1_3');
+	CONV_ROW_1_3.setAttribute('class','CONV_ROW_1_3');
+	CONV_ROW_1_4.setAttribute('id',FurnaceID + 'CONV_ROW_1_4');
+	CONV_ROW_1_4.setAttribute('class','CONV_ROW_1_2');
+	CONV_ROW_1_5.setAttribute('id',FurnaceID + 'CONV_ROW_1_5');
+	CONV_ROW_1_5.setAttribute('class','CONV_ROW_1_1');
+	CONV_ROW_2.setAttribute('id',FurnaceID + 'CONV_ROW_2');
+	CONV_ROW_2.setAttribute('class','CONV_ROW_1');
+	CONV_ROW_2_1.setAttribute('id',FurnaceID + 'CONV_ROW_2_1');
+	CONV_ROW_2_1.setAttribute('class','CONV_ROW_1_1');
+	CONV_ROW_2_2.setAttribute('id',FurnaceID + 'CONV_ROW_2_2');
+	CONV_ROW_2_2.setAttribute('class','CONV_ROW_2_2');
+	CONV_ROW_2_3.setAttribute('id',FurnaceID + 'CONV_ROW_2_3');
+	CONV_ROW_2_3.setAttribute('class','CONV_ROW_1_1');
+	CONV_ROW_3.setAttribute('id',FurnaceID + 'CONV_ROW_3');
+	CONV_ROW_3.setAttribute('class','CONV_ROW_1');
+	CONV_ROW_3_1.setAttribute('id',FurnaceID + 'CONV_ROW_3_1');
+	CONV_ROW_3_1.setAttribute('class','CONV_ROW_1_1');
+	CONV_ROW_3_2.setAttribute('id',FurnaceID + 'CONV_ROW_3_2');
+	CONV_ROW_3_2.setAttribute('class','CONV_ROW_3_2');
+	CONV_JIG_1.setAttribute('id',FurnaceID + 'CONV_JIG_5');
+	CONV_JIG_1.setAttribute('class','CONV_JIG_1');
+	CONV_JIG_2.setAttribute('id',FurnaceID + 'CONV_JIG_5A');
+	CONV_JIG_2.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_3.setAttribute('id',FurnaceID + 'CONV_JIG_5B');
+	CONV_JIG_3.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_4.setAttribute('id',FurnaceID + 'CONV_JIG_5C');
+	CONV_JIG_4.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_5.setAttribute('id',FurnaceID + 'CONV_JIG_4');
+	CONV_JIG_5.setAttribute('class','CONV_JIG_1');
+	CONV_JIG_6.setAttribute('id',FurnaceID + 'CONV_JIG_4A');
+	CONV_JIG_6.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_7.setAttribute('id',FurnaceID + 'CONV_JIG_4B');
+	CONV_JIG_7.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_8.setAttribute('id',FurnaceID + 'CONV_JIG_4C');
+	CONV_JIG_8.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_9.setAttribute('id',FurnaceID + 'CONV_JIG_3');
+	CONV_JIG_9.setAttribute('class','CONV_JIG_1');
+	CONV_JIG_10.setAttribute('id',FurnaceID + 'CONV_JIG_3A');
+	CONV_JIG_10.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_11.setAttribute('id',FurnaceID + 'CONV_JIG_3B');
+	CONV_JIG_11.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_12.setAttribute('id',FurnaceID + 'CONV_JIG_3C');
+	CONV_JIG_12.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_13.setAttribute('id',FurnaceID + 'CONV_JIG_2');
+	CONV_JIG_13.setAttribute('class','CONV_JIG_1');
+	CONV_JIG_14.setAttribute('id',FurnaceID + 'CONV_JIG_2A');
+	CONV_JIG_14.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_15.setAttribute('id',FurnaceID + 'CONV_JIG_2B');
+	CONV_JIG_15.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_16.setAttribute('id',FurnaceID + 'CONV_JIG_2C');
+	CONV_JIG_16.setAttribute('class','CONV_JIG_2');
+	CONV_JIG_17.setAttribute('id',FurnaceID + 'CONV_JIG_1');
+	CONV_JIG_17.setAttribute('class','CONV_JIG_1');
+	//CONV_JIG_18.setAttribute('id',FurnaceID + 'CONV_JIG_18');
+	//CONV_JIG_18.setAttribute('class','CONV_JIG_2');
+	//CONV_JIG_19.setAttribute('id',FurnaceID + 'CONV_JIG_19');
+	//CONV_JIG_19.setAttribute('class','CONV_JIG_1');
+	//CONV_JIG_20.setAttribute('id',FurnaceID + 'CONV_JIG_20');
+	//CONV_JIG_20.setAttribute('class','CONV_JIG_2');
+	//CONV_JIG_21.setAttribute('id',FurnaceID + 'CONV_JIG_21');
+	//CONV_JIG_21.setAttribute('class','CONV_JIG_2');
+	//CONV_JIG_22.setAttribute('id',FurnaceID + 'CONV_JIG_22');
+	//CONV_JIG_22.setAttribute('class','CONV_JIG_1');
+	CONV_ROW_3_3.setAttribute('id',FurnaceID + 'CONV_ROW_3_3');
+	CONV_ROW_3_3.setAttribute('class','CONV_ROW_3_2');
+	CONV_ROW_3_4.setAttribute('id',FurnaceID + 'CONV_ROW_3_4');
+	CONV_ROW_3_4.setAttribute('class','CONV_ROW_1_1');
+	CONV_CONV.setAttribute('id',FurnaceID + 'CONV_CONV');
+	CONV_CONV.setAttribute('class','CONV_CONV');
+	CONV_CONV_ROW_1.setAttribute('id',FurnaceID + 'CONV_CONV_ROW_1');
+	CONV_CONV_ROW_1.setAttribute('class','CONV_CONV_ROW_1');
+	CONV_CONV_ROW_2.setAttribute('id',FurnaceID + 'CONV_CONV_ROW_2');
+	CONV_CONV_ROW_2.setAttribute('class','CONV_CONV_ROW_2');
+	CONV_CONV_ROW_3.setAttribute('id',FurnaceID + 'CONV_CONV_ROW_3');
+	CONV_CONV_ROW_3.setAttribute('class','CONV_CONV_ROW_1');
+	
+	CV_1_SC_1_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_1_LK_1');   CV_1_SC_1_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_1_LK_2'); 
+	CV_1_SC_1_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_1_LK_3');   CV_1_SC_2_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_2_LK_1'); 
+	CV_1_SC_2_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_2_LK_2');   CV_1_SC_2_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_2_LK_3');
+	CV_1_SC_3_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_3_LK_1');   CV_1_SC_3_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_3_LK_2'); 
+	CV_1_SC_3_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_3_LK_3');   CV_1_SC_4_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_4_LK_1'); 
+	CV_1_SC_4_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_4_LK_2');   CV_1_SC_4_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_4_LK_3');
+	CV_1_SC_5_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_5_LK_1');   CV_1_SC_5_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_5_LK_2'); 
+	CV_1_SC_5_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_5_LK_3');   CV_1_SC_6_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_6_LK_1'); 
+	CV_1_SC_6_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_6_LK_2');   CV_1_SC_6_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_6_LK_3');
+	CV_1_SC_7_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_7_LK_1');   CV_1_SC_7_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_7_LK_2'); 
+	CV_1_SC_7_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_7_LK_3');   CV_1_SC_8_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_8_LK_1'); 
+	CV_1_SC_8_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_8_LK_2');   CV_1_SC_8_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_8_LK_3');
+	CV_1_SC_9_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_9_LK_1');   CV_1_SC_9_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_9_LK_2'); 
+	CV_1_SC_9_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_9_LK_3');   CV_1_SC_10_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_10_LK_1'); 
+	CV_1_SC_10_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_10_LK_2'); CV_1_SC_10_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_10_LK_3');
+	CV_1_SC_11_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_11_LK_1'); CV_1_SC_11_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_11_LK_2'); 
+	CV_1_SC_11_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_11_LK_3'); CV_1_SC_12_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_12_LK_1'); 
+	CV_1_SC_12_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_12_LK_2'); CV_1_SC_12_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_12_LK_3');
+	CV_1_SC_13_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_13_LK_1'); CV_1_SC_13_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_13_LK_2'); 
+	CV_1_SC_13_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_13_LK_3'); CV_1_SC_14_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_14_LK_1'); 
+	CV_1_SC_14_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_14_LK_2'); CV_1_SC_14_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_14_LK_3');
+	CV_1_SC_15_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_15_LK_1'); CV_1_SC_15_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_15_LK_2'); 
+	CV_1_SC_15_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_15_LK_3'); CV_1_SC_16_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_16_LK_1'); 
+	CV_1_SC_16_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_16_LK_2'); CV_1_SC_16_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_16_LK_3');
+	CV_1_SC_17_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_17_LK_1'); CV_1_SC_17_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_17_LK_2'); 
+	CV_1_SC_17_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_17_LK_3'); CV_1_SC_18_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_18_LK_1'); 
+	CV_1_SC_18_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_18_LK_2'); CV_1_SC_18_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_18_LK_3');
+	CV_1_SC_19_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_19_LK_1'); CV_1_SC_19_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_19_LK_2'); 
+	CV_1_SC_19_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_19_LK_3'); CV_1_SC_20_LK_1.setAttribute('id',FurnaceID + 'CV_1_SC_20_LK_1'); 
+	CV_1_SC_20_LK_2.setAttribute('id',FurnaceID + 'CV_1_SC_20_LK_2'); CV_1_SC_20_LK_3.setAttribute('id',FurnaceID + 'CV_1_SC_20_LK_3');
+	
+	CV_1_SC_1_LK_1.setAttribute('class','LINK_1');  CV_1_SC_1_LK_2.setAttribute('class','LINK_2');  CV_1_SC_1_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_2_LK_1.setAttribute('class','LINK_1');  CV_1_SC_2_LK_2.setAttribute('class','LINK_2');  CV_1_SC_2_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_3_LK_1.setAttribute('class','LINK_1');  CV_1_SC_3_LK_2.setAttribute('class','LINK_2');  CV_1_SC_3_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_4_LK_1.setAttribute('class','LINK_1');  CV_1_SC_4_LK_2.setAttribute('class','LINK_2');  CV_1_SC_4_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_5_LK_1.setAttribute('class','LINK_1');  CV_1_SC_5_LK_2.setAttribute('class','LINK_2');  CV_1_SC_5_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_6_LK_1.setAttribute('class','LINK_1');  CV_1_SC_6_LK_2.setAttribute('class','LINK_2');  CV_1_SC_6_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_7_LK_1.setAttribute('class','LINK_1');  CV_1_SC_7_LK_2.setAttribute('class','LINK_2');  CV_1_SC_7_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_8_LK_1.setAttribute('class','LINK_1');  CV_1_SC_8_LK_2.setAttribute('class','LINK_2');  CV_1_SC_8_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_9_LK_1.setAttribute('class','LINK_1');  CV_1_SC_9_LK_2.setAttribute('class','LINK_2');  CV_1_SC_9_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_10_LK_1.setAttribute('class','LINK_1'); CV_1_SC_10_LK_2.setAttribute('class','LINK_2'); CV_1_SC_10_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_11_LK_1.setAttribute('class','LINK_1'); CV_1_SC_11_LK_2.setAttribute('class','LINK_2'); CV_1_SC_11_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_12_LK_1.setAttribute('class','LINK_1'); CV_1_SC_12_LK_2.setAttribute('class','LINK_2'); CV_1_SC_12_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_13_LK_1.setAttribute('class','LINK_1'); CV_1_SC_13_LK_2.setAttribute('class','LINK_2'); CV_1_SC_13_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_14_LK_1.setAttribute('class','LINK_1'); CV_1_SC_14_LK_2.setAttribute('class','LINK_2'); CV_1_SC_14_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_15_LK_1.setAttribute('class','LINK_1'); CV_1_SC_15_LK_2.setAttribute('class','LINK_2'); CV_1_SC_15_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_16_LK_1.setAttribute('class','LINK_1'); CV_1_SC_16_LK_2.setAttribute('class','LINK_2'); CV_1_SC_16_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_17_LK_1.setAttribute('class','LINK_1'); CV_1_SC_17_LK_2.setAttribute('class','LINK_2'); CV_1_SC_17_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_18_LK_1.setAttribute('class','LINK_1'); CV_1_SC_18_LK_2.setAttribute('class','LINK_2'); CV_1_SC_18_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_19_LK_1.setAttribute('class','LINK_1'); CV_1_SC_19_LK_2.setAttribute('class','LINK_2'); CV_1_SC_19_LK_3.setAttribute('class','LINK_3');
+	CV_1_SC_20_LK_1.setAttribute('class','LINK_1'); CV_1_SC_20_LK_2.setAttribute('class','LINK_2'); CV_1_SC_20_LK_3.setAttribute('class','LINK_3');
+	
+	CV_2_SC_1_LK_1.setAttribute('id',FurnaceID + 'CV_2_SC_1_LK_1'); CV_2_SC_1_LK_2.setAttribute('id',FurnaceID + 'CV_2_SC_1_LK_2'); CV_2_SC_1_LK_3.setAttribute('id',FurnaceID + 'CV_2_SC_1_LK_3');   
+	CV_2_SC_1_LK_1.setAttribute('class','LINK_1');  CV_2_SC_1_LK_2.setAttribute('class','LINK_2_ROW_2');  CV_2_SC_1_LK_3.setAttribute('class','LINK_3');
+
+	CV_2_CIRCLE_1.setAttribute('id',FurnaceID + 'CV_2_CIRCLE_1');
+	CV_2_CIRCLE_1.setAttribute('class','CV_2_CIRCLE_1');
+	CV_2_BAR.setAttribute('id',FurnaceID + 'CV_2_BAR');
+	CV_2_BAR.setAttribute('class','CV_2_BAR');
+	CV_2_CIRCLE_2.setAttribute('id',FurnaceID + 'CV_2_CIRCLE_2');
+	CV_2_CIRCLE_2.setAttribute('class','CV_2_CIRCLE_1');
+	
+	CV_2_SC_2_LK_1.setAttribute('id',FurnaceID + 'CV_2_SC_2_LK_1'); CV_2_SC_2_LK_2.setAttribute('id',FurnaceID + 'CV_2_SC_2_LK_2'); CV_2_SC_2_LK_3.setAttribute('id',FurnaceID + 'CV_2_SC_2_LK_3');
+	CV_2_SC_2_LK_1.setAttribute('class','LINK_1');  CV_2_SC_2_LK_2.setAttribute('class','LINK_2_ROW_2');  CV_2_SC_2_LK_3.setAttribute('class','LINK_3');
+	
+	CV_3_SC_1_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_1_LK_1');   CV_3_SC_1_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_1_LK_2'); 
+	CV_3_SC_1_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_1_LK_3');   CV_3_SC_2_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_2_LK_1'); 
+	CV_3_SC_2_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_2_LK_2');   CV_3_SC_2_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_2_LK_3');
+	CV_3_SC_3_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_3_LK_1');   CV_3_SC_3_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_3_LK_2'); 
+	CV_3_SC_3_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_3_LK_3');   CV_3_SC_4_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_4_LK_1'); 
+	CV_3_SC_4_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_4_LK_2');   CV_3_SC_4_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_4_LK_3');
+	CV_3_SC_5_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_5_LK_1');   CV_3_SC_5_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_5_LK_2'); 
+	CV_3_SC_5_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_5_LK_3');   CV_3_SC_6_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_6_LK_1'); 
+	CV_3_SC_6_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_6_LK_2');   CV_3_SC_6_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_6_LK_3');
+	CV_3_SC_7_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_7_LK_1');   CV_3_SC_7_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_7_LK_2'); 
+	CV_3_SC_7_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_7_LK_3');   CV_3_SC_8_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_8_LK_1'); 
+	CV_3_SC_8_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_8_LK_2');   CV_3_SC_8_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_8_LK_3');
+	CV_3_SC_9_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_9_LK_1');   CV_3_SC_9_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_9_LK_2'); 
+	CV_3_SC_9_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_9_LK_3');   CV_3_SC_10_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_10_LK_1'); 
+	CV_3_SC_10_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_10_LK_2'); CV_3_SC_10_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_10_LK_3');
+	CV_3_SC_11_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_11_LK_1'); CV_3_SC_11_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_11_LK_2'); 
+	CV_3_SC_11_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_11_LK_3'); CV_3_SC_12_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_12_LK_1'); 
+	CV_3_SC_12_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_12_LK_2'); CV_3_SC_12_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_12_LK_3');
+	CV_3_SC_13_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_13_LK_1'); CV_3_SC_13_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_13_LK_2'); 
+	CV_3_SC_13_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_13_LK_3'); CV_3_SC_14_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_14_LK_1'); 
+	CV_3_SC_14_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_14_LK_2'); CV_3_SC_14_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_14_LK_3');
+	CV_3_SC_15_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_15_LK_1'); CV_3_SC_15_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_15_LK_2'); 
+	CV_3_SC_15_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_15_LK_3'); CV_3_SC_16_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_16_LK_1'); 
+	CV_3_SC_16_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_16_LK_2'); CV_3_SC_16_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_16_LK_3');
+	CV_3_SC_17_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_17_LK_1'); CV_3_SC_17_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_17_LK_2'); 
+	CV_3_SC_17_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_17_LK_3'); CV_3_SC_18_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_18_LK_1'); 
+	CV_3_SC_18_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_18_LK_2'); CV_3_SC_18_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_18_LK_3');
+	CV_3_SC_19_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_19_LK_1'); CV_3_SC_19_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_19_LK_2'); 
+	CV_3_SC_19_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_19_LK_3'); CV_3_SC_20_LK_1.setAttribute('id',FurnaceID + 'CV_3_SC_20_LK_1'); 
+	CV_3_SC_20_LK_2.setAttribute('id',FurnaceID + 'CV_3_SC_20_LK_2'); CV_3_SC_20_LK_3.setAttribute('id',FurnaceID + 'CV_3_SC_20_LK_3');
+
+    CV_3_SC_1_LK_1.setAttribute('class','LINK_3');  CV_3_SC_1_LK_2.setAttribute('class','LINK_2');  CV_3_SC_1_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_2_LK_1.setAttribute('class','LINK_3');  CV_3_SC_2_LK_2.setAttribute('class','LINK_2');  CV_3_SC_2_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_3_LK_1.setAttribute('class','LINK_3');  CV_3_SC_3_LK_2.setAttribute('class','LINK_2');  CV_3_SC_3_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_4_LK_1.setAttribute('class','LINK_3');  CV_3_SC_4_LK_2.setAttribute('class','LINK_2');  CV_3_SC_4_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_5_LK_1.setAttribute('class','LINK_3');  CV_3_SC_5_LK_2.setAttribute('class','LINK_2');  CV_3_SC_5_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_6_LK_1.setAttribute('class','LINK_3');  CV_3_SC_6_LK_2.setAttribute('class','LINK_2');  CV_3_SC_6_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_7_LK_1.setAttribute('class','LINK_3');  CV_3_SC_7_LK_2.setAttribute('class','LINK_2');  CV_3_SC_7_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_8_LK_1.setAttribute('class','LINK_3');  CV_3_SC_8_LK_2.setAttribute('class','LINK_2');  CV_3_SC_8_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_9_LK_1.setAttribute('class','LINK_3');  CV_3_SC_9_LK_2.setAttribute('class','LINK_2');  CV_3_SC_9_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_10_LK_1.setAttribute('class','LINK_3'); CV_3_SC_10_LK_2.setAttribute('class','LINK_2'); CV_3_SC_10_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_11_LK_1.setAttribute('class','LINK_3'); CV_3_SC_11_LK_2.setAttribute('class','LINK_2'); CV_3_SC_11_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_12_LK_1.setAttribute('class','LINK_3'); CV_3_SC_12_LK_2.setAttribute('class','LINK_2'); CV_3_SC_12_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_13_LK_1.setAttribute('class','LINK_3'); CV_3_SC_13_LK_2.setAttribute('class','LINK_2'); CV_3_SC_13_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_14_LK_1.setAttribute('class','LINK_3'); CV_3_SC_14_LK_2.setAttribute('class','LINK_2'); CV_3_SC_14_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_15_LK_1.setAttribute('class','LINK_3'); CV_3_SC_15_LK_2.setAttribute('class','LINK_2'); CV_3_SC_15_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_16_LK_1.setAttribute('class','LINK_3'); CV_3_SC_16_LK_2.setAttribute('class','LINK_2'); CV_3_SC_16_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_17_LK_1.setAttribute('class','LINK_3'); CV_3_SC_17_LK_2.setAttribute('class','LINK_2'); CV_3_SC_17_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_18_LK_1.setAttribute('class','LINK_3'); CV_3_SC_18_LK_2.setAttribute('class','LINK_2'); CV_3_SC_18_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_19_LK_1.setAttribute('class','LINK_3'); CV_3_SC_19_LK_2.setAttribute('class','LINK_2'); CV_3_SC_19_LK_3.setAttribute('class','LINK_1');
+	CV_3_SC_20_LK_1.setAttribute('class','LINK_3'); CV_3_SC_20_LK_2.setAttribute('class','LINK_2'); CV_3_SC_20_LK_3.setAttribute('class','LINK_1');
+	
+	CONV_ROW_4.setAttribute('id',FurnaceID + 'CONV_ROW_4');
+	CONV_ROW_4.setAttribute('class','CONV_ROW_4');
+	CONV_ROW_4_1.setAttribute('id',FurnaceID + 'CONV_ROW_4_1');
+	CONV_ROW_4_1.setAttribute('class','CONV_ROW_1_1');
+	CONV_ROW_4_2.setAttribute('id',FurnaceID + 'CONV_ROW_4_2');
+	CONV_ROW_4_2.setAttribute('class','CONV_ROW_2_2');
+	CONV_ROW_4_3.setAttribute('id',FurnaceID + 'CONV_ROW_4_3');
+	CONV_ROW_4_3.setAttribute('class','CONV_ROW_1_1');
+	CONV_ROW_5.setAttribute('id',FurnaceID + 'CONV_ROW_5');
+	CONV_ROW_5.setAttribute('class','CONV_ROW_5');
+
+	ParentDiv.appendChild(CONV_DOORS);
+	CONV_DOORS.appendChild(CONV_DOOR_LEFT);
+	CONV_DOOR_LEFT.appendChild(CONV_DOOR_LEFT_1);
+	CONV_DOOR_LEFT.appendChild(CONV_DOOR_LEFT_2);
+	CONV_DOOR_LEFT.appendChild(CONV_DOOR_LEFT_3);
+	CONV_DOOR_LEFT.appendChild(CONV_DOOR_LEFT_4);
+	CONV_DOORS.appendChild(CONV_DOOR_RIGHT);
+	CONV_DOOR_RIGHT.appendChild(CONV_DOOR_RIGHT_1);
+	CONV_DOOR_RIGHT.appendChild(CONV_DOOR_RIGHT_2);
+	CONV_DOOR_RIGHT.appendChild(CONV_DOOR_RIGHT_3);
+	CONV_DOOR_RIGHT.appendChild(CONV_DOOR_RIGHT_4);
+	ParentDiv.appendChild(CONV_ROW_1);
+	CONV_ROW_1.appendChild(CONV_ROW_1_1);
+	CONV_ROW_1.appendChild(CONV_ROW_1_2);
+	CONV_ROW_1.appendChild(CONV_ROW_1_3);
+	CONV_ROW_1.appendChild(CONV_ROW_1_4);
+	CONV_ROW_1.appendChild(CONV_ROW_1_5);
+	ParentDiv.appendChild(CONV_ROW_2);
+	CONV_ROW_2.appendChild(CONV_ROW_2_1);
+	CONV_ROW_2.appendChild(CONV_ROW_2_2);
+	CONV_ROW_2.appendChild(CONV_ROW_2_3);
+	ParentDiv.appendChild(CONV_ROW_3);
+	CONV_ROW_3.appendChild(CONV_ROW_3_1);
+	CONV_ROW_3.appendChild(CONV_ROW_3_2);
+	CONV_ROW_3.appendChild(CONV_JIG_1);
+	CONV_ROW_3.appendChild(CONV_JIG_2);
+	CONV_ROW_3.appendChild(CONV_JIG_3);
+	CONV_ROW_3.appendChild(CONV_JIG_4);
+	CONV_ROW_3.appendChild(CONV_JIG_5);
+	CONV_ROW_3.appendChild(CONV_JIG_6);
+	CONV_ROW_3.appendChild(CONV_JIG_7);
+	CONV_ROW_3.appendChild(CONV_JIG_8);
+	CONV_ROW_3.appendChild(CONV_JIG_9);
+	CONV_ROW_3.appendChild(CONV_JIG_10);
+	CONV_ROW_3.appendChild(CONV_JIG_11);
+	CONV_ROW_3.appendChild(CONV_JIG_12);
+	CONV_ROW_3.appendChild(CONV_JIG_13);
+	CONV_ROW_3.appendChild(CONV_JIG_14);
+	CONV_ROW_3.appendChild(CONV_JIG_15);
+	CONV_ROW_3.appendChild(CONV_JIG_16);
+	CONV_ROW_3.appendChild(CONV_JIG_17);
+	//CONV_ROW_3.appendChild(CONV_JIG_18);
+	//CONV_ROW_3.appendChild(CONV_JIG_19);
+	//CONV_ROW_3.appendChild(CONV_JIG_20);
+	//CONV_ROW_3.appendChild(CONV_JIG_21);
+	//CONV_ROW_3.appendChild(CONV_JIG_22);
+	CONV_ROW_3.appendChild(CONV_ROW_3_3);
+	CONV_ROW_3.appendChild(CONV_ROW_3_4);
+	ParentDiv.appendChild(CONV_CONV);
+	CONV_CONV.appendChild(CONV_CONV_ROW_1);
+	CONV_CONV_ROW_1.appendChild(CV_2_SC_1_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_1_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_1_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_1_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_2_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_2_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_2_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_3_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_3_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_3_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_4_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_4_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_4_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_5_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_5_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_5_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_6_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_6_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_6_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_7_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_7_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_7_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_8_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_8_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_8_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_9_LK_1);  CONV_CONV_ROW_1.appendChild(CV_1_SC_9_LK_2);  CONV_CONV_ROW_1.appendChild(CV_1_SC_9_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_10_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_10_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_10_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_11_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_11_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_11_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_12_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_12_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_12_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_13_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_13_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_13_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_14_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_14_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_14_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_15_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_15_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_15_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_16_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_16_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_16_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_17_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_17_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_17_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_18_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_18_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_18_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_19_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_19_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_19_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_1_SC_20_LK_1); CONV_CONV_ROW_1.appendChild(CV_1_SC_20_LK_2); CONV_CONV_ROW_1.appendChild(CV_1_SC_20_LK_3);
+	CONV_CONV_ROW_1.appendChild(CV_2_SC_2_LK_1);
+	
+	CONV_CONV.appendChild(CONV_CONV_ROW_2);
+	CONV_CONV_ROW_2.appendChild(CV_2_SC_1_LK_2); 
+	CONV_CONV_ROW_2.appendChild(CV_2_CIRCLE_1);
+	CONV_CONV_ROW_2.appendChild(CV_2_BAR);
+	CONV_CONV_ROW_2.appendChild(CV_2_CIRCLE_2);
+	CONV_CONV_ROW_2.appendChild(CV_2_SC_2_LK_2); 
+
+	CONV_CONV.appendChild(CONV_CONV_ROW_3);
+	CONV_CONV_ROW_3.appendChild(CV_2_SC_1_LK_1);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_1_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_1_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_1_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_2_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_2_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_2_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_3_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_3_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_3_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_4_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_4_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_4_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_5_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_5_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_5_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_6_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_6_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_6_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_7_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_7_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_7_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_8_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_8_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_8_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_9_LK_1);  CONV_CONV_ROW_3.appendChild(CV_3_SC_9_LK_2);  CONV_CONV_ROW_3.appendChild(CV_3_SC_9_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_10_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_10_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_10_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_11_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_11_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_11_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_12_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_12_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_12_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_13_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_13_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_13_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_14_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_14_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_14_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_15_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_15_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_15_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_16_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_16_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_16_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_17_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_17_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_17_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_18_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_18_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_18_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_19_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_19_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_19_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_3_SC_20_LK_1); CONV_CONV_ROW_3.appendChild(CV_3_SC_20_LK_2); CONV_CONV_ROW_3.appendChild(CV_3_SC_20_LK_3);
+	CONV_CONV_ROW_3.appendChild(CV_2_SC_2_LK_3);
+	
+	ParentDiv.appendChild(CONV_ROW_4);
+	CONV_ROW_4.appendChild(CONV_ROW_4_1);
+	CONV_ROW_4.appendChild(CONV_ROW_4_2);
+	CONV_ROW_4.appendChild(CONV_ROW_4_3);
+	ParentDiv.appendChild(CONV_ROW_5);
+}
+
+function setJIGs(ID,FurnaceID){
+
+	if((!ModbusData[ID].CON_Forward && !ModbusData[ID].CON_Reverse) || !ModbusData[ID].CON_OT){
+		jigAnim=1;
+		SetJigState(ModbusData[ID].CON_POS_5,FurnaceID,5);
+		SetJigState(ModbusData[ID].CON_POS_4,FurnaceID,4);
+		SetJigState(ModbusData[ID].CON_POS_3,FurnaceID,3);
+		SetJigState(ModbusData[ID].CON_POS_2,FurnaceID,2);
+		SetJigState(ModbusData[ID].CON_POS_1,FurnaceID,1);
+	} else {
+		if(ModbusData[ID].CON_Forward){
+			SetJigAnim(jigPos[4],ModbusData[ID].CON_POS_5,ModbusData[ID].CON_POS_4,FurnaceID,5,jigAnim);
+			SetJigAnim(jigPos[3],ModbusData[ID].CON_POS_4,ModbusData[ID].CON_POS_3,FurnaceID,4,jigAnim);
+			SetJigAnim(jigPos[2],ModbusData[ID].CON_POS_3,ModbusData[ID].CON_POS_2,FurnaceID,3,jigAnim);
+			SetJigAnim(jigPos[1],ModbusData[ID].CON_POS_2,ModbusData[ID].CON_POS_1,FurnaceID,2,jigAnim);
+			jigAnim++;
+			if(jigAnim>3){jigAnim=1;};
+		}
+	}
+}
+
+function SetJigState(ISJIGTRUE,FurnaceID,JIGNUM){
+	if(ISJIGTRUE){
+			jigPos[JIGNUM] = true;
+			document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM).style.backgroundColor = 'darkblue';
+		} else{
+			jigPos[JIGNUM] = false;
+			document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM).style.backgroundColor = 'white';
+		}
+		if(JIGNUM>1){
+			document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM + 'A').style.backgroundColor = 'white';
+			document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM + 'B').style.backgroundColor = 'white';
+			document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM + 'C').style.backgroundColor = 'white';
+		};
+		jigPos[JIGNUM+5] = false;
+}
+
+function SetJigAnim(PRESTATE,CURRSTATE,LASTPOS,FurnaceID,JIGNUM,ANIMNUM){
+	var JIG1 = document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM);
+	if(JIGNUM>1){
+		var JIG1A = document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM + 'A');
+		var JIG1B = document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM + 'B');
+		var JIG1C = document.getElementById(FurnaceID + 'CONV_JIG_' + JIGNUM + 'C');
+	};
+	if(PRESTATE){
+		if(CURRSTATE){
+			JIG1.style.backgroundColor = 'darkblue';
+			if(JIGNUM>1){
+				JIG1A.style.backgroundColor = 'white';
+				JIG1B.style.backgroundColor = 'white';
+				JIG1C.style.backgroundColor = 'white';
+			};
+		} else {
+			if(!LASTPOS){
+				if(!jigPos[JIGNUM+5]){
+					document.getElementById(FurnaceID + 'CONV_JIG_' + (JIGNUM-1)).style.backgroundColor = 'white';
+					jigPos[JIGNUM+5] = true;
+				};
+				if(ANIMNUM==1){
+					JIG1.style.backgroundColor = 'white';
+					if(JIGNUM>1){
+						JIG1A.style.backgroundColor = 'lightskyblue';
+						JIG1B.style.backgroundColor = 'lightskyblue';
+						JIG1C.style.backgroundColor = 'mediumturquoise';
+					};
+				};
+				if(ANIMNUM==2){
+					JIG1.style.backgroundColor = 'white';
+					if(JIGNUM>1){
+						JIG1A.style.backgroundColor = 'lightskyblue';
+						JIG1B.style.backgroundColor = 'mediumturquoise';
+						JIG1C.style.backgroundColor = 'lightskyblue';
+					};
+				};
+				if(ANIMNUM==3){
+					JIG1.style.backgroundColor = 'white';
+					if(JIGNUM>1){
+						JIG1A.style.backgroundColor = 'mediumturquoise';
+						JIG1B.style.backgroundColor = 'lightskyblue';
+						JIG1C.style.backgroundColor = 'lightskyblue';
+					};
+				};
+			};
+		};
+	};
+}
+
+function setCONVAction(ID,FurnaceID){
+	if(!ModbusData[ID].CON_OT){
+		if(convAnim == 1){
+			for (let i = 1; i <= 20; i++) {
+				if(i<3){
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_1').style.backgroundColor = 'red';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_2').style.backgroundColor = 'red';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_3').style.backgroundColor = 'red';
+				}
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_1').style.backgroundColor = 'red';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_2').style.backgroundColor = 'red';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_3').style.backgroundColor = 'red';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_1').style.backgroundColor = 'red';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_2').style.backgroundColor = 'red';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_3').style.backgroundColor = 'red';
+			}
+		}
+		if(convAnim == 2){
+			for (let i = 1; i <= 20; i++) {
+				if(i<3){
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				}
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+			}
+		}
+		convAnim++;
+		if(convAnim>2){convAnim=1};
+	} else {
+		if(!ModbusData[ID].CON_Forward && !ModbusData[ID].CON_Reverse){
+			for (let i = 1; i <= 20; i++) {
+				if(i<3){
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_1').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				}
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_1').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_3').style.backgroundColor = 'grey';
+			}
+		}
+	}
+	if((ModbusData[ID].CON_Forward || ModbusData[ID].CON_Reverse) && ModbusData[ID].CON_OT){
+		if(convAnim == 1){
+			for (let i = 1; i <= 20; i++) {
+				if(i<3){
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_1').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				}
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_1').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_3').style.backgroundColor = 'grey';
+			}
+		}
+		if(convAnim == 2){
+			for (let i = 1; i <= 20; i++) {
+				if(i<3){
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_3').style.backgroundColor = 'grey';
+				}
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_3').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_1').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_2').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+			}
+		}
+		if(convAnim == 3){
+			for (let i = 1; i <= 20; i++) {
+				if(i<3){
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_2').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_2_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				}
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_2').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_1_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_1').style.backgroundColor = 'dimgrey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_2').style.backgroundColor = 'grey';
+				document.getElementById(FurnaceID + 'CV_3_SC_' + i + '_LK_3').style.backgroundColor = 'dimgrey';
+			}
+		}
+	}
+	
+	if(ModbusData[ID].CON_Forward && !ModbusData[ID].CON_Reverse && ModbusData[ID].CON_OT){convAnim++;if(convAnim>4){convAnim=1};};
+	if(!ModbusData[ID].CON_Forward && ModbusData[ID].CON_Reverse && ModbusData[ID].CON_OT){convAnim--;if(convAnim<1){convAnim=3};};
+}
+
+function setCONVDoors(ID,FurnaceID){
+	var CONV_DOOR_LEFT_1 = document.getElementById(FurnaceID + 'CONV_DOOR_LEFT_1');
+	var CONV_DOOR_LEFT_2 = document.getElementById(FurnaceID + 'CONV_DOOR_LEFT_2');
+	var CONV_DOOR_LEFT_3 = document.getElementById(FurnaceID + 'CONV_DOOR_LEFT_3');
+	var CONV_DOOR_LEFT_4 = document.getElementById(FurnaceID + 'CONV_DOOR_LEFT_4');
+	var CONV_DOOR_RIGHT_1 = document.getElementById(FurnaceID + 'CONV_DOOR_RIGHT_1');
+	var CONV_DOOR_RIGHT_2 = document.getElementById(FurnaceID + 'CONV_DOOR_RIGHT_2');
+	var CONV_DOOR_RIGHT_3 = document.getElementById(FurnaceID + 'CONV_DOOR_RIGHT_3');
+	var CONV_DOOR_RIGHT_4 = document.getElementById(FurnaceID + 'CONV_DOOR_RIGHT_4');
+	
+	if(ModbusData[ID].UD_OPEN){
+		CONV_DOOR_LEFT_2.style.backgroundColor = 'darkgrey';
+		CONV_DOOR_LEFT_3.style.color = 'black';
+		CONV_DOOR_LEFT_3.style.backgroundColor = 'black';
+		CONV_DOOR_LEFT_4.style.color = 'black';
+		CONV_DOOR_LEFT_4.style.backgroundColor = 'black';
+	} else {
+		if(ModbusData[ID].UD_CLOSED){
+			CONV_DOOR_LEFT_1.style.color = 'black';
+			CONV_DOOR_LEFT_1.style.backgroundColor = 'black';
+			CONV_DOOR_LEFT_2.style.color = 'black';
+			CONV_DOOR_LEFT_2.style.backgroundColor = 'black';
+			CONV_DOOR_LEFT_3.style.color = 'darkgrey';
+			CONV_DOOR_LEFT_3.style.backgroundColor = 'darkgrey';
+			CONV_DOOR_LEFT_4.style.color = 'darkgrey';
+			CONV_DOOR_LEFT_4.style.backgroundColor = 'darkgrey';
+		} else {
+			if(dryerDoorFlash){
+				CONV_DOOR_LEFT_1.style.color = 'darkgrey';
+				CONV_DOOR_LEFT_1.style.backgroundColor = 'darkgrey';
+				CONV_DOOR_LEFT_2.style.color = 'black';
+				CONV_DOOR_LEFT_2.style.backgroundColor = 'grey';
+				CONV_DOOR_LEFT_3.style.color = 'black';
+				CONV_DOOR_LEFT_3.style.backgroundColor = 'grey';
+				CONV_DOOR_LEFT_4.style.color = 'darkgrey';
+				CONV_DOOR_LEFT_4.style.backgroundColor = 'darkgrey';
+			}else{
+				CONV_DOOR_LEFT_1.style.color = 'darkgrey';
+				CONV_DOOR_LEFT_1.style.backgroundColor = 'darkgrey';
+				CONV_DOOR_LEFT_2.style.color = 'black';
+				CONV_DOOR_LEFT_2.style.backgroundColor = 'black';
+				CONV_DOOR_LEFT_3.style.color = 'black';
+				CONV_DOOR_LEFT_3.style.backgroundColor = 'black';
+				CONV_DOOR_LEFT_4.style.color = 'darkgrey';
+				CONV_DOOR_LEFT_4.style.backgroundColor = 'darkgrey';
+			}
+		}
+	}
+	
+	if(ModbusData[ID].LD_OPEN){
+		CONV_DOOR_RIGHT_1.style.color = 'black';
+		CONV_DOOR_RIGHT_1.style.backgroundColor = 'black';
+		CONV_DOOR_RIGHT_2.style.color = 'black';
+		CONV_DOOR_RIGHT_2.style.backgroundColor = 'black';
+		CONV_DOOR_RIGHT_3.style.color = 'darkgrey';
+		CONV_DOOR_RIGHT_3.style.backgroundColor = 'darkgrey';
+		CONV_DOOR_RIGHT_4.style.color = 'darkgrey';
+		CONV_DOOR_RIGHT_4.style.backgroundColor = 'darkgrey';
+	} else {
+		if(ModbusData[ID].LD_CLOSED){
+			CONV_DOOR_RIGHT_1.style.color = 'darkgrey';
+			CONV_DOOR_RIGHT_1.style.backgroundColor = 'darkgrey';
+			CONV_DOOR_RIGHT_2.style.color = 'darkgrey';
+			CONV_DOOR_RIGHT_2.style.backgroundColor = 'darkgrey';
+			CONV_DOOR_RIGHT_3.style.color = 'black';
+			CONV_DOOR_RIGHT_3.style.backgroundColor = 'black';
+			CONV_DOOR_RIGHT_4.style.color = 'black';
+			CONV_DOOR_RIGHT_4.style.backgroundColor = 'black';
+		} else {
+			if(dryerDoorFlash){
+				CONV_DOOR_RIGHT_1.style.color = 'darkgrey';
+				CONV_DOOR_RIGHT_1.style.backgroundColor = 'darkgrey';
+				CONV_DOOR_RIGHT_2.style.color = 'black';
+				CONV_DOOR_RIGHT_2.style.backgroundColor = 'grey';
+				CONV_DOOR_RIGHT_3.style.color = 'black';
+				CONV_DOOR_RIGHT_3.style.backgroundColor = 'grey';
+				CONV_DOOR_RIGHT_4.style.color = 'darkgrey';
+				CONV_DOOR_RIGHT_4.style.backgroundColor = 'darkgrey';
+			}else{
+				CONV_DOOR_RIGHT_1.style.color = 'darkgrey';
+				CONV_DOOR_RIGHT_1.style.backgroundColor = 'darkgrey';
+				CONV_DOOR_RIGHT_2.style.color = 'black';
+				CONV_DOOR_RIGHT_2.style.backgroundColor = 'black';
+				CONV_DOOR_RIGHT_3.style.color = 'black';
+				CONV_DOOR_RIGHT_3.style.backgroundColor = 'black';
+				CONV_DOOR_RIGHT_4.style.color = 'darkgrey';
+				CONV_DOOR_RIGHT_4.style.backgroundColor = 'darkgrey';
+			}
+		}
+	}
+	dryerDoorFlash = !dryerDoorFlash;
+	
 }
 
 function createHMISections(ParentDivName,BurnerCount,FurnaceID){
@@ -1372,10 +2251,13 @@ function createHMISections(ParentDivName,BurnerCount,FurnaceID){
 	HMI_SECTION_MIDDLE_TOP_SYS.setAttribute('id',FurnaceID + '_HMI_SECTION_MIDDLE_TOP_SYS');
 	HMI_SECTION_MIDDLE_TOP_SYS.setAttribute('class','HMI_SECTION_MIDDLE_TOP_SYS');
 	HMI_SECTION_MIDDLE_TOP_BACK.setAttribute('id',FurnaceID + '_HMI_SECTION_MIDDLE_TOP_BACK');
+	
 	HMI_SECTION_MIDDLE_TOP_BACK.setAttribute('class','HMI_TOP_BACK');
 	//HMI_SECTION_MIDDLE_TOP_BACK.setAttribute('onClick','MiddleHMIClicked(this);');
 	
 	HMI_SECTION_MIDDLE_TOP_FORGROUND.setAttribute('id',FurnaceID + '_HMI_SECTION_MIDDLE_TOP_FOREGROUND');
+	HMI_SECTION_MIDDLE_TOP_FORGROUND.setAttribute('onClick','cycleLangugage();');
+	
 	HMI_SECTION_MIDDLE_TOP_FORGROUND.setAttribute('class','HMI_TOP_FOREGROUND');
 	//HMI_SECTION_MIDDLE_TOP_FORGROUND.setAttribute('onClick','MiddleHMIClicked(this);');
 	
@@ -1478,7 +2360,7 @@ function createHMISections(ParentDivName,BurnerCount,FurnaceID){
 	HMI_SECTION_MIDDLE_TOP_BACK.appendChild(HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE);
 	HMI_SECTION_MIDDLE_TOP_BACK_MIDDLE.appendChild(HMI_SECTION_MIDDLE_TOP_BACK_TEXT);
 	
-	document.getElementById(FurnaceID + '_HMI_SECTION_MIDDLE_TOP_SYS').innerText = 'System OFF';
+	document.getElementById(FurnaceID + '_HMI_SECTION_MIDDLE_TOP_SYS').innerText = TEXTARRAY[5][LANSEL];//'System OFF';
 }
 
 function createPressureSwitches(FurnaceID,ID,BurnerCount){
@@ -1605,16 +2487,16 @@ function createPurgeGroup(FurnaceID,ParentDivName,ID){
 	PURGE_LINE_2.appendChild(PURGE_CIRCLE_2);
 	PURGE_LINE_2.appendChild(PURGE_TEXT_2);
 	
-	var ThisZoneTitle = 'Zone ';
+	var ThisZoneTitle = TEXTARRAY[7][LANSEL] + ' ';//'Zone ';
 	if(ID == 1){
 		ThisZoneTitle += 'A';
 	} else {
 		ThisZoneTitle += 'B';
 	};
-	ThisZoneTitle += ' Fan';
+	ThisZoneTitle += ' ' + TEXTARRAY[8][LANSEL]; //' Fan';
 	document.getElementById(FurnaceID + '_PURGE_' + ID + '_BOX_TITLE').innerText = ThisZoneTitle;
-	document.getElementById(FurnaceID + '_PURGE_' + ID + '_TEXT_1').innerText = 'Purging';
-	document.getElementById(FurnaceID + '_PURGE_' + ID + '_TEXT_2').innerText = 'Complete';
+	document.getElementById(FurnaceID + '_PURGE_' + ID + '_TEXT_1').innerText = TEXTARRAY[9][LANSEL];//'Purging';
+	document.getElementById(FurnaceID + '_PURGE_' + ID + '_TEXT_2').innerText = TEXTARRAY[10][LANSEL];//'Complete';
 }
 
 function createFanGroup(FurnaceID,ParentDivName,ID){
@@ -1703,7 +2585,7 @@ function createFanGroup(FurnaceID,ParentDivName,ID){
 	FAN_BOX_RIGHT_TOP.appendChild(FAN_BLADE);
 	FAN_BOX_RIGHT_TOP.appendChild(FAN_COVER);
 	
-	document.getElementById(FurnaceID + '_FAN_' + ID + '_BOX_RIGHT_FAULT').innerText = 'Fault'
+	document.getElementById(FurnaceID + '_FAN_' + ID + '_BOX_RIGHT_FAULT').innerText = TEXTARRAY[11][LANSEL];//'Fault'
 }
 
 function FanColorReset(FurnaceID,ID){
@@ -1968,7 +2850,7 @@ function createFlame(FurnaceID,ParentDivName,ID,WidthVal,HeightVal,Reversed){
 	FLAME_FAULT.setAttribute('style','display:none;' + STYLE_EXTRA);
 	FLAME_FAULT.setAttribute('class','FLAME_FAULT');
 	ParentDiv.appendChild(FLAME);
-	document.getElementById(FurnaceID + '_FLAME_FAULT_' + ID).innerText = 'Fault';
+	document.getElementById(FurnaceID + '_FLAME_FAULT_' + ID).innerText = TEXTARRAY[11][LANSEL];//'Fault';
 }
 
 function createValve(FurnaceID,ParentDivName,ID,WidthVal,HeightVal){
