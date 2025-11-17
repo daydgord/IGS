@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
 
-/*CSS Version 4.1.3*/
+/*CSS Version 5.1.1*/
 
 :root {
 	--disabled-grey: #e6e6e6;
@@ -330,6 +330,28 @@
     top: 0;
 }
 
+.DRYER_SECTION_TOP{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 50%;
+    box-sizing: border-box;
+    padding: 2%;
+    flex-direction: row;
+	justify-content: center;
+    align-items: flex-start;
+}
+
+.DRYER_SECTION_BOT{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 50%;
+    box-sizing: border-box;
+    padding: 2%;
+    flex-direction: column;
+}
+
 .DRYER_SECTION_LEFT{
     display: flex;
     position: relative;
@@ -338,6 +360,7 @@
 	box-sizing: border-box;
 	padding: 2%;
 	flex-direction: column;
+	font-size: 1.5vh;
 }
 
 .DRYER_SECTION_RIGHT{
@@ -348,6 +371,7 @@
 	box-sizing: border-box;
 	padding: 2%;
 	flex-direction: column;
+	font-size: 1.5vh;
 }
 
 .DRYER_DOOR{
@@ -367,7 +391,7 @@
     display: flex;
     position: relative;
     width: 100%;
-    height: 20%;
+    height: 25%;
     justify-content: center;
     align-items: center;
 }
@@ -376,21 +400,22 @@
 	display: flex;
     position: relative;
     width: 100%;
-    height: 40%;
-	flex-direction: column;
+    height: 25%;
+	flex-direction: row;
+    align-items: center;
 }
 
 .DRYER_SECTION_RIGHT_BOT{
 	display: flex;
     position: relative;
     width: 100%;
-    height: 20%;
+    height: 25%;
 	justify-content: center;
     align-items: center;
 }
 
 .DRYER_CB{
-    padding: 0.25rem;
+
     display: flex;
     position: relative;
     background-color: white;
@@ -399,12 +424,12 @@
     justify-content: center;
     align-items: center;
     border: 0.1rem solid #555;
-    height: fit-content;
+    height: 90%;
 	width: 90%;
 }
 
 .DRYER_STATUS{
-	padding: 0.25rem;
+
     display: flex;
     position: relative;
     background-color: grey;
@@ -413,12 +438,12 @@
     justify-content: center;
     align-items: center;
     border: 0.1rem solid #555;
-    height: fit-content;
+    height: 90%;
 	width: 90%;
 }
 
 .DRYER_MODE{
-	padding: 0.25rem;
+	
     display: flex;
     position: relative;
     background-color: grey;
@@ -427,9 +452,270 @@
     justify-content: center;
     align-items: center;
     border: 0.1rem solid #555;
-    height: fit-content;
+    height: 90%;
 	width: 90%;
 }
+
+.CONV_DOORS{
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 10%;
+    justify-content: center;
+    align-items: center;
+}
+.CONV_DOOR_LEFT{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    justify-content: left;
+    align-items: center;
+	margin-left: 5.5%;	
+}
+.CONV_DOOR_LEFT_1{
+	display: flex;
+    position: relative;
+    width: 20%;
+    height: 100%;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+.CONV_DOOR_RIGHT{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    justify-content: right;
+    align-items: center;
+	margin-right: 5.5%;
+}
+.CONV_DOOR_RIGHT_1{
+	display: flex;
+    position: relative;
+    width: 20%;
+    height: 100%;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+.CONV_ROW_1{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 10%;
+    justify-content: center;
+    align-items: center;
+}
+
+.CONV_ROW_4{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 20%;
+    justify-content: center;
+    align-items: center;
+}
+
+.CONV_ROW_5{
+	display: flex;
+    position: relative;
+    width: 92%;
+    height: 10%;
+	background-color: black;
+    color: lightgrey;
+    justify-content: center;
+    align-items: center;
+	margin-left: 4%;
+}
+
+.CONV_ROW_1_1{
+	display: flex;
+    position: relative;
+    width: 2%;
+    height: 100%;
+    background-color: black;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+.CONV_ROW_1_2{
+	display: flex;
+    position: relative;
+    width: 17%;
+    height: 100%;
+    background-color: white;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+.CONV_ROW_1_3{
+	display: flex;
+    position: relative;
+    width: 54%;
+    height: 100%;
+    background-color: black;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+	}
+
+.CONV_ROW_2_2{
+	display: flex;
+    position: relative;
+    width: 88%;
+    height: 100%;
+    background-color: white;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+	
+.CONV_ROW_3_2{
+	display: flex;
+    position: relative;
+    width: 3.5%;
+    height: 100%;
+    background-color: white;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+	}
+	
+.CONV_JIG_1{
+	display: flex;
+    position: relative;
+    width: 9%;
+    height: 100%;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+	}
+	
+.CONV_JIG_2{
+	display: flex;
+    position: relative;
+    width: 3%;
+    height: 100%;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+	}
+	
+.CONV_CONV{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: 24%;
+    justify-content: center;
+    align-items: center;
+	flex-direction: column;
+}
+
+.CONV_CONV_ROW_1{
+	display: flex;
+    position: relative;
+    width: 93%;
+    height: calc(100% / 3);
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+
+.CONV_CONV_ROW_2{
+	display: flex;
+    position: relative;
+    width: 100%;
+    height: calc(100% / 3);
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+
+.LINK_1{
+	position: relative;
+    width: calc(100% / 22);
+    height: 100%;
+    background-color: grey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    /*border: solid;*/
+}
+.LINK_2{
+	position: relative;
+    width: calc(100% / 22);
+    height: 100%;
+    background-color: dimgrey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    /*border: solid;*/
+}
+
+.LINK_2_ROW_2{
+	position: relative;
+    width: calc(100% / 60);
+    height: 100%;
+    background-color: dimgrey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    /*border: solid;*/
+}
+
+.LINK_3{
+	position: relative;
+    width: calc(100% / 22);
+    height: 100%;
+    background-color: dimgrey;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    /*border: solid;*/
+}
+.CV_2_CIRCLE_1{
+	position: relative;
+    width: calc(100% / 50);
+    height: 100%;
+    background-color: black;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    /*border: solid;*/
+    border-radius: 50%;
+}
+.CV_2_BAR{
+	position: relative;
+    width: 88%;
+    height: 100%;
+    background-color: black;
+    color: lightgrey;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    /*border: solid;*/
+}
+
 
 .HMI_DRYER{
 	position: relative;
@@ -770,10 +1056,11 @@
 	display: inline-flex;
 	height: 40vh;
 	justify-content: center;
-	align-items: center;
+	align-items: flex-start;
 	text-align: center;
 	background-color: darkgray;
 	width: 100%;
+	flex-direction: column;
 }
 
 .HMI_CONT_DATA{
@@ -890,8 +1177,7 @@
 }
 
 .HMI_TOP_BACK_TEXT{
-	/*color: white;*/
-	color: black;
+	color: white;
 	font-size: calc(2vh + 2vw);
 }
 
@@ -1192,7 +1478,7 @@
 	border: 1px solid #555;
 	justify-content: center;
 	align-items: center;
-	font-size: calc(1.2vw + 1.2vh);
+	font-size: calc(1vw + 1vh);
 }
 
 .HMI_DATA{
@@ -1297,7 +1583,7 @@
 	border: 1px solid #555;
 	justify-content: center;
 	align-items: center;
-	font-size: calc(1.2vw + 1.2vh);
+	font-size: calc(1vw + 1vh);
 }
 
 .DRY_DATA{
@@ -1479,25 +1765,29 @@
 	height: 4%;
 	width:100vw;
 }
+
+.DRYER_SECTION_RIGHT_MID{
+	flex-direction: column;
+}
   
 .DRYER_DOOR{
-	font-size:2vw;
+	font-size:1vw;
 }
   
 .DRYER_CB{
-	font-size:2vw;
+	font-size:3vh;
 }
 
 .DRYER_STATUS{
-	font-size:2vw;
+	font-size:3vh;
 }
 
 .DRYER_MODE{
-	font-size:2vw;
+	font-size:3vh;
 }
 
 .DRYER_FAN_BOX_BOT{
-	font-size:2vw;
+	font-size:1vw;
 }
   
  .myChart{
@@ -1770,12 +2060,32 @@
 	width: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 35));
 	left: calc(-117% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 1.5));
 }
+.CONV_DOORS{
+	height: 5%;
+}
+
+.CONV_ROW_1{
+    height: 5%;
+}
+
+.CONV_ROW_4{
+    height: 10%;
+}
+
+.CONV_ROW_5{
+    height: 5%;
+}
+
+.CONV_CONV{
+    height: 12%;
+}
 
 #tab_row{    
 	height: 6vh;
 }
 
 }
+
 
 
 
