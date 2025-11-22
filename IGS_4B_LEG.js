@@ -1,4 +1,4 @@
-const Code_Ver = "5.1.1";
+const Code_Ver = "5.1.2";
 const ModbusData = [];
 const CustomerData = [];
 var SampleCount = 3;
@@ -3050,3 +3050,4 @@ window.chartColors = {
 	/* eslint-enable */
 
 }(this));
+
