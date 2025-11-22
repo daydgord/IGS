@@ -39,7 +39,7 @@ let TEXTARRAY = [
     ["Output","เอาท์พุต"],
 	["Gas Flow","การไหลของก๊าซ"],
 	["System OFF","ปิดระบบ"],
-	["Sysem ON","ระบบเปิดอยู่"],
+	["System ON","ระบบเปิดอยู่"],
 	["Zone","โซน"],
 	["Fan","พัดลม"],
 	["Purging","การกวาดล้าง"],
@@ -3050,4 +3050,5 @@ window.chartColors = {
 	/* eslint-enable */
 
 }(this));
+
 
