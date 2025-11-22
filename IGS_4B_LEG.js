@@ -264,8 +264,8 @@ function UpdateText(ID){
 function Main(){
 	LANSEL = getCookie("LANSELVAL");
 	if(thisFurnaceID!=''){thisFurnaceIDArray[0]=thisFurnaceID;thisFurnaceIDArray[1]=thisFurnaceID;};
-	if(thisFurnaceIDArray[0]=="DR"){thisFurnaceIDArray[0]="XPress";};
-	if(thisFurnaceIDArray[1]=="DR"){thisFurnaceIDArray[1]="XPress";};
+	if(thisFurnaceIDArray[0]=="SC"){thisFurnaceIDArray[0]="XPress";};
+	if(thisFurnaceIDArray[1]=="SC"){thisFurnaceIDArray[1]="XPress";};
 	CustomerData.push({Customer: thisCustomer, FurnaceID: thisFurnaceIDArray[LANSEL], IncludeDips: false, BurnerCount: thisBurnerCount});
 	for(var i=0;i<CustomerData.length;i++){
 		if(CustomerData[i].BurnerCount == 12){centerTop = 10.75;};
@@ -3050,5 +3050,6 @@ window.chartColors = {
 	/* eslint-enable */
 
 }(this));
+
 
 
