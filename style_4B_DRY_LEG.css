@@ -1503,7 +1503,7 @@
 	border: 1px solid #555;
 	justify-content: center;
 	align-items: center;
-	font-size: calc(4vw + 4vh);
+	font-size: calc(2.5vw + 2.5vh);
 }
 
 .HMI_DATA_MAX{
@@ -1608,7 +1608,7 @@
 	border: 1px solid #555;
 	justify-content: center;
 	align-items: center;
-	font-size: calc(4vw + 4vh);
+	font-size: calc(2.5vw + 2.5vh);
 }
 
 .DRY_DATA_MAX{
