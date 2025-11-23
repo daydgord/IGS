@@ -2106,6 +2106,9 @@ function setCONVDoors(ID,FurnaceID){
 	var CONV_DOOR_RIGHT_4 = document.getElementById(FurnaceID + 'CONV_DOOR_RIGHT_4');
 	
 	if(ModbusData[ID].UD_OPEN){
+		CONV_DOOR_LEFT_1.style.color = 'darkgrey';
+		CONV_DOOR_LEFT_1.style.backgroundColor = 'darkgrey';
+		CONV_DOOR_LEFT_2.style.color = 'darkgrey';
 		CONV_DOOR_LEFT_2.style.backgroundColor = 'darkgrey';
 		CONV_DOOR_LEFT_3.style.color = 'black';
 		CONV_DOOR_LEFT_3.style.backgroundColor = 'black';
@@ -3051,4 +3054,5 @@ window.chartColors = {
 
 
 }(this));
+
 
