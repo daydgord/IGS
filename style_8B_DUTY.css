@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
 
-/*CSS Version 5.2.1*/
+/*CSS Version 1.0 DUTY*/
 
 :root {
 	--disabled-grey: #e6e6e6;
@@ -46,7 +46,7 @@
 	--pipe-right-gap-1-L:3vh;
 	--burner-group-height:7vh;
 	--BHL:calc(75vh * 0.75);
-	--BHP:calc(80vh * 0.375);
+	--BHP:calc(140vh * 0.375);
 }
 
 .GROUP_GAS_1{
@@ -117,8 +117,8 @@
 .GROUP_AIR_1A{
 	background-color: blue;
 	position: absolute;
-	left: calc(var(--pipe-width-P) * 4);
-	right: calc(var(--pipe-width-P) * 4);
+	left: calc(var(--pipe-width-P) * 3);
+	right: calc(var(--pipe-width-P) * 3);
 	Top: calc(50% - calc(var(--pipe-width-P)/2));
 	height: var(--pipe-width-P);
 	width: 200%;
@@ -142,7 +142,7 @@
 	right: calc(var(--pipe-width-P) * 2);
 	Top: calc(50% - calc(var(--pipe-width-P)/2));
 	width: var(--pipe-width-P);
-	height: 210%;
+	height: 230%;
 }
 
 .GROUP_AIR_3B{
@@ -291,7 +291,7 @@
 .landing-HMI {
 	position: relative;
 	display: flex;
-	flex: 0 1 50vw;
+	flex: 0 1 100vw;
 	/*height: var(--port_height);*/
 	flex-direction: column;
 }
@@ -302,6 +302,7 @@
 	flex: 0 1 50vw;
 	/*height: var(--port_height);*/
 	flex-direction: column;
+	display: none;
 }
 
 .landing-PARAM {
@@ -965,7 +966,7 @@
 .FAN_AIR_2C{
 	background-color: blue;
 	position: absolute;
-	height: calc(54% - calc(var(--pipe-width-P) * 2 ));
+	height: calc(62% - calc(var(--pipe-width-P) * 2 ));
 	top: 46%;
 	width: calc(var(--pipe-width-P) * 1);
 	left: calc(100% - calc(var(--pipe-width-P) * 2) + calc(var(--pipe-width-P) * 0.6));
@@ -1009,7 +1010,7 @@
 
 .HMI_CONTROLS {
 	display: flex;
-	height: 10vh;
+	height: 20vh;
 	justify-content: center;
 	align-items: center;
 	text-align: center;
@@ -1043,7 +1044,7 @@
 .HMI_GRAPHICS {
 	position: relative;
 	display: inline-flex;
-	height: 40vh;
+	height: 80vh;
 	justify-content: center;
 	align-items: center;
 	text-align: center;
@@ -1151,7 +1152,7 @@
 	height: calc(calc(calc(calc(var(--BHP)*.9)/8)*7) + calc(var(--BHP)*.05));
 	box-sizing: border-box;
 	width: 100%;
-	margin-top: 7%;
+	margin-top: 0%;
 }
 
 .HMI_TOP_FOREGROUND{
@@ -1922,8 +1923,8 @@
 }
 
 .GROUP_AIR_1A{
-	left: calc(var(--pipe-width-L) * 4);
-	right: calc(var(--pipe-width-L) * 4);
+	left: calc(var(--pipe-width-L) * 3);
+	right: calc(var(--pipe-width-L) * 3);
 	Top: calc(50% - calc(var(--pipe-width-L)/2));
 	height: var(--pipe-width-L);
 }
@@ -2044,7 +2045,7 @@
 }
 
 .FAN_AIR_2C{
-	height: calc(54% - calc(var(--pipe-width-L) * 2 ));
+	height: calc(60% - calc(var(--pipe-width-L) * 2 ));
 	width: calc(var(--pipe-width-L) * 1);
 	left: calc(100% - calc(var(--pipe-width-L) * 2) + calc(var(--pipe-width-L) * 0.6));
 }
