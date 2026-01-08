@@ -1,4 +1,4 @@
-const Code_Ver = "5.2.1";
+const Code_Ver = "1.0 DUTY";
 const ModbusData = [];
 const CustomerData = [];
 var SampleCount = 3;
@@ -13,6 +13,7 @@ var thisDryer = true;
 var thisEnclosure = false;
 var thisDipCount = false;
 var thisFlowRate = false;
+var thisMultilanguage = false;
 var thisRefreshRate = 500;
 var refreshCount = 1;
 var visible = true;
@@ -86,7 +87,9 @@ function GetArduinoInputs(){
 							ModbusData[0].FLUE_PID_SP = this.responseXML.getElementsByTagName('flueSP')[0].childNodes[0].nodeValue;
 							ModbusData[0].GAS_FLOW_PV = this.responseXML.getElementsByTagName('gasflow')[0].childNodes[0].nodeValue;
 							ModbusData[0].FAN_1_SPEED = this.responseXML.getElementsByTagName('fanAspeed')[0].childNodes[0].nodeValue;
+							if(ModbusData[0].FAN_1_SPEED<3){ModbusData[0].FAN_1_SPEED = 0;};
 							ModbusData[0].FAN_2_SPEED = this.responseXML.getElementsByTagName('fanBspeed')[0].childNodes[0].nodeValue;
+							if(ModbusData[0].FAN_2_SPEED<3){ModbusData[0].FAN_2_SPEED = 0;};
 							ModbusData[0].EX_IN = this.responseXML.getElementsByTagName('exin')[0].childNodes[0].nodeValue;
 							ModbusData[0].EX_OUT = this.responseXML.getElementsByTagName('exout')[0].childNodes[0].nodeValue;
 							ModbusData[0].DRY_IN = this.responseXML.getElementsByTagName('dryin')[0].childNodes[0].nodeValue;
@@ -200,7 +203,7 @@ function GetSIMdata(){
 }
 
 function cycleLangugage(){
-	LANSEL++;
+	if(thisMultilanguage){LANSEL++};
 	if(LANSEL>1){LANSEL=0;};
 	UpdateText(MasterID);
 	//document.cookie = "LANSELVAL=" + LANSEL + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
@@ -1446,7 +1449,7 @@ function createDRYERSections(ParentDivName,FurnaceID){
 	DRYER_FAN_BLADE.setAttribute('class','fan Dryerfan');
 	
 	DRYER_FAN_COVER.setAttribute('id',FurnaceID + '_DRYER_FAN_COVER');
-	DRYER_FAN_COVER.setAttribute('src',getPipeSvg());
+	DRYERFAN_AIR_3BCOVER.setAttribute('src',getPipeSvg());
 	DRYER_FAN_COVER.setAttribute('alt','Dryer Fan Ring');
 	DRYER_FAN_COVER.setAttribute('class','Ring1');
 	
@@ -2374,8 +2377,8 @@ function createHMISections(ParentDivName,BurnerCount,FurnaceID){
 				if(i==0){
 					createBurnerGroup(FurnaceID,FurnaceID + '_HMI_SECTION_LEFT_TOP','B' + 1,'100%',HeightVal + '%',false)
 					createBurnerGroup(FurnaceID,FurnaceID + '_HMI_SECTION_RIGHT_TOP','B' + 3,'100%',HeightVal + '%',true)
-					createFlameGroup(FurnaceID,FurnaceID + '_HMI_SECTION_MIDDLE_TOP_LEFT','B' + 1,'100%',HeightVal3 + '%',HeightVal2 + '%',false,BackWrapper)
-					createFlameGroup(FurnaceID,FurnaceID + '_HMI_SECTION_MIDDLE_TOP_RIGHT','B' + 3,'100%',HeightVal3 + '%',HeightVal2 + '%',true,false)
+					createFlameGroup(FurnaceID,FurnaceID + '_HMI_SECTION_MIDDLE_TOP_LEFT','B' + 1,'100%',(HeightVal3 + 5 ) + '%',HeightVal2 + '%',false,BackWrapper)
+					createFlameGroup(FurnaceID,FurnaceID + '_HMI_SECTION_MIDDLE_TOP_RIGHT','B' + 3,'100%',(HeightVal3 + 5 ) + '%',HeightVal2 + '%',true,false)
 				};
 				if(i==1){
 					createBurnerGroup(FurnaceID,FurnaceID + '_HMI_SECTION_LEFT_TOP','B' + 2,'100%',HeightVal + '%',false)
@@ -2573,8 +2576,8 @@ function createFanGroup(FurnaceID,ParentDivName,ID){
 	var FAN_COVER = document.createElement('img');
 	var FAN_AIR_1 = document.createElement('div');
 	var FAN_AIR_2 = document.createElement('div');
-	var FAN_AIR_2B = document.createElement('div');
-	var FAN_AIR_3 = document.createElement('div');
+	//var FAN_AIR_2B = document.createElement('div');
+	//var FAN_AIR_3 = document.createElement('div');
 	
 	FAN_BOX.setAttribute('id',FurnaceID + '_FAN_' + ID + '_BOX');
 	FAN_BOX.setAttribute('class','FAN_BOX');
@@ -2584,18 +2587,18 @@ function createFanGroup(FurnaceID,ParentDivName,ID){
 	FAN_AIR_1.setAttribute('id',FurnaceID + '_FAN_' + ID + '_AIR_1');
 	FAN_AIR_1.setAttribute('class','FAN_AIR_1');
 	FAN_AIR_2.setAttribute('id',FurnaceID + '_FAN_' + ID + '_AIR_2');
-	FAN_AIR_2B.setAttribute('id',FurnaceID + '_FAN_' + ID + '_AIR_2B');
-	FAN_AIR_2B.setAttribute('class','FAN_AIR_2B');
+	//FAN_AIR_2B.setAttribute('id',FurnaceID + '_FAN_' + ID + '_AIR_2B');
+	//FAN_AIR_2B.setAttribute('class','FAN_AIR_2B');
 	//FAN_AIR_2.setAttribute('class','FAN_AIR_2');
-	FAN_AIR_3.setAttribute('id',FurnaceID + '_FAN_' + ID + '_AIR_3');
+	//FAN_AIR_3.setAttribute('id',FurnaceID + '_FAN_' + ID + '_AIR_3');
 	//FAN_AIR_3.setAttribute('class','FAN_AIR_3');
-	if(ID == 1){
+	//if(ID == 1){
 		FAN_AIR_2.setAttribute('class','FAN_AIR_2C');
-		FAN_AIR_3.setAttribute('class','FAN_AIR_3B');
-	}else{
-		FAN_AIR_2.setAttribute('class','FAN_AIR_2');
-		FAN_AIR_3.setAttribute('class','FAN_AIR_3');
-	}
+		//FAN_AIR_3.setAttribute('class','FAN_AIR_3B');
+	//}else{
+		//FAN_AIR_2.setAttribute('class','FAN_AIR_2');
+		//FAN_AIR_3.setAttribute('class','FAN_AIR_3');
+	//}
 	
 	//FAN_BOX_LEFT_TOP.setAttribute('id',FurnaceID + '_FAN_' + ID + '_BOX_LEFT_TOP');
 	//FAN_BOX_LEFT_TOP.setAttribute('class','FAN_BOX_LEFT_TOP');
@@ -2629,8 +2632,8 @@ function createFanGroup(FurnaceID,ParentDivName,ID){
 	ParentDiv.appendChild(FAN_BOX);
 	ParentDiv.appendChild(FAN_AIR_1);
 	ParentDiv.appendChild(FAN_AIR_2);
-	if(ID == 2){ParentDiv.appendChild(FAN_AIR_2B);};
-	ParentDiv.appendChild(FAN_AIR_3);
+	//if(ID == 2){ParentDiv.appendChild(FAN_AIR_2B);};
+	//ParentDiv.appendChild(FAN_AIR_3);
 	FAN_BOX.appendChild(FAN_BOX_LEFT);
 	//FAN_BOX_LEFT.appendChild(FAN_BOX_LEFT_TOP);
 	FAN_BOX_LEFT.appendChild(FAN_BOX_LEFT_MID);
@@ -2770,7 +2773,7 @@ function createBurnerGroup(FurnaceID,ParentDiv,ID,WidthVal,HeightVal,Reversed){
 	GROUP_C1_BOT.appendChild(GROUP_AIR_1);
 	GROUP_C5_BOT.appendChild(GROUP_AIR_2);
 	GROUP_C1_BOT.appendChild(GROUP_AIR_3);
-	if(ID.includes("A")){GROUP_C1_BOT.appendChild(GROUP_AIR_3B);};
+	//if(ID.includes("A")){GROUP_C1_BOT.appendChild(GROUP_AIR_3B);};
 	if(Reversed){		
 		GROUP.appendChild(GROUP_C5);
 		GROUP.appendChild(GROUP_C3);
