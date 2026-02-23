@@ -16,7 +16,7 @@ var centerTop = 14;
 var TopMaximised = false;
 var HMITrendMaximised = false;
 var USESIM = false;
-var myChart;
+//var myChart;
 var LogSuccess = false;
 
 function GetArduinoInputs(){
@@ -143,142 +143,6 @@ function TimeFix(thisValue){
 	return thisValue;
 }
 
-function defineChart(){
-	window.chartColors = {
-		red: 'rgb(255, 0, 0)',
-		orange: 'rgb(255, 159, 64)',
-		yellow: 'rgb(255, 205, 86)',
-		green: 'rgb(0, 192, 0)',
-		blue: 'rgb(0, 0, 255)',
-		purple: 'rgb(238, 130, 238)',
-		grey: 'rgb(201, 203, 207)'
-	};
-	const chartData1 = [];
-	const chartData2 = [];
-	const chartData3 = [];
-	const chartData4 = [];
-	const chartData5 = [];
-	
-	var labels = new Array(3600);
-	//var prev = 420;
-	//var prev2 = 50;
-	//var prev4 = 550;
-		
-	var prevx = new Date(); 
-	
-	
-	
-	for (let i = 3600; i > -1; i--) {
-		//prev += 5 - Math.random() * 10;
-		chartData1.push({y: 0});
-		//prev2 += 5 - Math.random() * 10;
-		chartData2.push({y: 0});
-		//prev4 += 5 - Math.random() * 10;
-		chartData4.push({y: 0});
-		chartData5.push({y: 0});
-		chartData3.push({y: 0});
-		var thisH = TimeFix(prevx.getHours());
-		var thisM = TimeFix(prevx.getMinutes());
-		var thisS = TimeFix(prevx.getSeconds());
-
-		labels[i] = thisH + ':' + thisM + ':' + thisS;
-		prevx.setTime(prevx.getTime() - 1000); //
-		//console.log(prevx);
-	}
-	
-	var color = Chart.helpers.color;
-	var ctx = document.getElementById('myChart').getContext('2d');
-	myChart = new Chart(ctx, {
-		type: 'line',
-		data: {
-			labels: labels,
-			datasets: [{
-				label: 'Zinc Temp',
-				data: chartData1,
-				backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.red,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.2,
-				borderWidth: 2
-			},{
-				label: 'Output',
-				data: chartData2,
-				backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.blue,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.2,
-				borderWidth: 2
-			},{
-				label: 'Zinc Setpoint',
-				data: chartData3,
-				backgroundColor: color(window.chartColors.purple).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.purple,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.1,
-				borderWidth: 1
-			},{
-				label: 'Flue Temp',
-				data: chartData4,
-				backgroundColor: color(window.chartColors.green).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.green,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.2,
-				borderWidth: 2
-			},{
-				label: 'Flue Setpoint',
-				data: chartData5,
-				backgroundColor: color(window.chartColors.yellow).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.yellow,
-				pointRadius: 0,
-				fill: false,
-				lineTension: 0.2,
-				borderWidth: 2
-			}]
-		},
-		options: {
-			scales: {
-				y: {
-					suggestedMin: 400,
-					suggestedMax: 500
-				},
-				x: {
-					type: 'time',
-					time: {
-						unit: 'month'
-					}
-				}
-			}
-		}
-	});
-}
-
-function chartUpdate(ID){	
-	var prevx = new Date(); 
-	var thisH = TimeFix(prevx.getHours());
-	var thisM = TimeFix(prevx.getMinutes());
-	var thisS = TimeFix(prevx.getSeconds());
-	
-	myChart.data.labels.shift();
-	myChart.data.datasets[0].data.shift();
-	myChart.data.datasets[1].data.shift();
-	myChart.data.datasets[2].data.shift();
-	myChart.data.datasets[3].data.shift();
-	myChart.data.datasets[4].data.shift();
-	
-	myChart.data.labels.push(thisH + ':' + thisM + ':' + thisS);
-	myChart.data.datasets[0].data.push({y: (ModbusData[ID].ZINC_TEMP_PV/10)});
-	
-	myChart.data.datasets[1].data.push({y: ModbusData[ID].PID_SEL_OP/10});
-	myChart.data.datasets[2].data.push({y: ModbusData[ID].ZINC_PID_SP/10});
-	myChart.data.datasets[3].data.push({y: ModbusData[ID].FLUE_TEMP_PV/10});
-	myChart.data.datasets[4].data.push({y: ModbusData[ID].FLUE_PID_SP/10});
-	
-	myChart.update();
-}
 
 function decAdj(intVal,divFactor,decP){
 	var LeftVal = Math.floor(intVal / divFactor);
@@ -607,7 +471,7 @@ function updateHMI(ID) {
 	setPurgeState(FurnaceID,1,ModbusData[ID].ZAPurge,ModbusData[ID].ZAPComp);
 	setPurgeState(FurnaceID,2,ModbusData[ID].ZBPurge,ModbusData[ID].ZBPComp);
 	setSystemState(FurnaceID,ModbusData[ID].SYS_ON);
-	chartUpdate(ID);
+	//chartUpdate(ID);
 }
 
 function setDryerDoor(DoorID,DoorStatus){
@@ -837,9 +701,9 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	var LANDING_DRYER_CONTROLS = document.createElement("div");
 	var LANDING_DRYER_GRAPHICS = document.createElement("div");
 	var LANDING_PARAM = document.createElement("div");
-	var LANDING_TREND = document.createElement("div");
-	var LANDING_TREND_FOREGROUND = document.createElement("div");
-	var LANDINF_TREND_CANVAS = document.createElement("canvas");
+	//var LANDING_TREND = document.createElement("div");
+	//var LANDING_TREND_FOREGROUND = document.createElement("div");
+	//var LANDINF_TREND_CANVAS = document.createElement("canvas");
 	LANDING.appendChild(LANDING_HMI);
 	LANDING_HMI.appendChild(LANDING_HMI_CONTROLS);
 	LANDING_HMI.appendChild(LANDING_HMI_GRAPHICS);
@@ -849,7 +713,7 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	//LANDING.appendChild(LANDING_PARAM);
 	//LANDING.appendChild(LANDING_TREND);
 	//LANDING.appendChild(LANDING_TREND_FOREGROUND);
-	LANDING_TREND.appendChild(LANDINF_TREND_CANVAS);
+	//LANDING_TREND.appendChild(LANDINF_TREND_CANVAS);
 	
 	LANDING.setAttribute('id',FurnaceID + '_LANDING');
 	LANDING.setAttribute('class','landing');
@@ -881,8 +745,8 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	LANDING_TREND_FOREGROUND.setAttribute('style','display:none;');
 	//LANDING_TREND_FOREGROUND.setAttribute('onClick','MiddleHMIClicked(this);');
 	
-	LANDINF_TREND_CANVAS.setAttribute('id','myChart');
-	LANDINF_TREND_CANVAS.setAttribute('class','myChart');
+	//LANDINF_TREND_CANVAS.setAttribute('id','myChart');
+	//LANDINF_TREND_CANVAS.setAttribute('class','myChart');
 	
 	ParentDiv.appendChild(LANDING);
 	createHMIControls(FurnaceID + '_LANDING_HMI_CONTROLS',FurnaceID,IncludeDips);
