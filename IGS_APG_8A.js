@@ -14,7 +14,7 @@ var thisRefreshRate = 2000;
 var visible = true;
 var centerTop = 14;
 var TopMaximised = false;
-var HMITrendMaximised = false;
+//var HMITrendMaximised = false;
 var USESIM = false;
 //var myChart;
 var LogSuccess = false;
@@ -735,14 +735,14 @@ function createLayout(FurnaceID,ParentDivName,IncludeDips,BurnerCount,visible){
 	LANDING_PARAM.setAttribute('id',FurnaceID + '_LANDING_PARAM');
 	LANDING_PARAM.setAttribute('class','landing-PARAM');
 	LANDING_PARAM.setAttribute('style','display:none;');
-	LANDING_TREND.setAttribute('id',FurnaceID + '_LANDING_TREND');
-	LANDING_TREND.setAttribute('class','landing-TREND');
-	LANDING_TREND.setAttribute('style','display:none;');
+	//LANDING_TREND.setAttribute('id',FurnaceID + '_LANDING_TREND');
+	//LANDING_TREND.setAttribute('class','landing-TREND');
+	//LANDING_TREND.setAttribute('style','display:none;');
 	//LANDING_TREND.setAttribute('onClick','MiddleHMIClicked(this);');
 	
-	LANDING_TREND_FOREGROUND.setAttribute('id',FurnaceID + '_LANDING_TREND_FOREGROUND');
-	LANDING_TREND_FOREGROUND.setAttribute('class','landing-TREND_FOREGROUND');
-	LANDING_TREND_FOREGROUND.setAttribute('style','display:none;');
+	//LANDING_TREND_FOREGROUND.setAttribute('id',FurnaceID + '_LANDING_TREND_FOREGROUND');
+	//LANDING_TREND_FOREGROUND.setAttribute('class','landing-TREND_FOREGROUND');
+	//LANDING_TREND_FOREGROUND.setAttribute('style','display:none;');
 	//LANDING_TREND_FOREGROUND.setAttribute('onClick','MiddleHMIClicked(this);');
 	
 	//LANDINF_TREND_CANVAS.setAttribute('id','myChart');
@@ -765,18 +765,18 @@ function MiddleHMIClicked(ElementData){
 	var DRYERGraphicsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER_GRAPHICS');
 	//var TrendArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_TREND');
 	//var TrendAreaForeground = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_TREND_FOREGROUND');
-	if(HMITrendMaximised){
+	//if(HMITrendMaximised){
 		HMIWrapper.style.display = '';
 		//DRYERWrapper.style.display = '';
 		//TrendArea.style.display = 'none';
 		//TrendAreaForeground.style.display = 'none';
-	} else {
+	//} else {
 		HMIWrapper.style.display = 'none';
 		//DRYERWrapper.style.display = 'none';
 		//TrendArea.style.display = '';
 		//TrendAreaForeground.style.display = '';
-	};
-	HMITrendMaximised = !HMITrendMaximised;
+	//};
+	//HMITrendMaximised = !HMITrendMaximised;
 }
 
 function TopControlsClicked(ElementData,isDryer){
@@ -787,7 +787,7 @@ function TopControlsClicked(ElementData,isDryer){
 	//var DRYERWrapper = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER');
 	var DRYERControlsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER_CONTROLS');
 	var DRYERGraphicsArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_DRYER_GRAPHICS');
-	var TrendArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_TREND');
+	//var TrendArea = document.getElementById(Element_Data[0] + '_' + Element_Data[1] + '_LANDING_TREND');
 	if(isDryer){
 		if(TopMaximised){
 			console.log("Minimising");
